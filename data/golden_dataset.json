@@ -1,0 +1,285 @@
+[
+  {
+    "id": "gold-001",
+    "scenario": "prerequisite_chain_query",
+    "query": "What are the prerequisites for CS420 Cybersecurity and is there a bottleneck?",
+    "expected_refs": ["CRS-010", "CS420", "CS301", "CS410", "POL-PREREQ-001"],
+    "criteria": {
+      "references_tracked_course": true,
+      "references_policy": true,
+      "identifies_bottleneck": true,
+      "suggests_resolution": true
+    },
+    "persona": "professor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-002",
+    "scenario": "curriculum_gap_detection",
+    "query": "What curriculum gaps have been identified and what courses address them?",
+    "expected_refs": ["REV-012", "REV-013", "CRS-025", "CS430", "POL-GAP-001"],
+    "criteria": {
+      "references_gap_review": true,
+      "references_proposed_course": true,
+      "references_policy": true,
+      "action_steps_present": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-003",
+    "scenario": "enrollment_trend_analysis",
+    "query": "Show me the enrollment trends for CS101 across semesters. Is it at capacity?",
+    "expected_refs": ["CRS-001", "CS101"],
+    "criteria": {
+      "references_course": true,
+      "includes_enrollment_data": true,
+      "mentions_waitlist": true,
+      "trend_direction_stated": true
+    },
+    "persona": "professor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-004",
+    "scenario": "accreditation_compliance",
+    "query": "Are we meeting ABET student outcome requirements? What needs attention?",
+    "expected_refs": ["POL-ABET-001", "POL-ABET-002", "POL-ASSESS-001"],
+    "criteria": {
+      "references_abet_policy": true,
+      "lists_outcomes": true,
+      "identifies_gaps": true,
+      "action_steps_present": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-005",
+    "scenario": "faculty_load_balancing",
+    "query": "Which faculty members are overloaded and what should we do about it?",
+    "expected_refs": ["FAC-002", "POL-LOAD-001"],
+    "criteria": {
+      "identifies_overloaded_faculty": true,
+      "references_load_policy": true,
+      "quantifies_overload": true,
+      "suggests_resolution": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-006",
+    "scenario": "emerging_skills_integration",
+    "query": "How well does our CS program cover cloud-native and DevOps skills? What's missing?",
+    "expected_refs": ["CRS-020", "CRS-025", "CS430", "SE340", "POL-GAP-001"],
+    "criteria": {
+      "identifies_existing_coverage": true,
+      "identifies_gaps": true,
+      "references_proposed_course": true,
+      "action_steps_present": true
+    },
+    "persona": "professor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-007",
+    "scenario": "course_proposal_evaluation",
+    "query": "Should we approve the proposed Reinforcement Learning course AI470? What does the data say?",
+    "expected_refs": ["CRS-018", "AI470", "AI450", "PRG-AI-CERT", "POL-CERT-001"],
+    "criteria": {
+      "references_proposed_course": true,
+      "evaluates_prerequisites": true,
+      "references_program_requirements": true,
+      "recommendation_stated": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-008",
+    "scenario": "student_feedback_synthesis",
+    "query": "What are students saying about CS201 Data Structures? What should we change?",
+    "expected_refs": ["CRS-002", "CS201", "REV-002"],
+    "criteria": {
+      "references_course": true,
+      "references_review": true,
+      "includes_score": true,
+      "action_steps_present": true
+    },
+    "persona": "professor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-009",
+    "scenario": "program_comparison",
+    "query": "Compare the Computer Science BS program on Main Campus vs Satellite Campus. Where are the differences?",
+    "expected_refs": ["PRG-CS-BS", "PRG-CS-SAT"],
+    "criteria": {
+      "references_both_programs": true,
+      "identifies_differences": true,
+      "mentions_accreditation": true,
+      "quantifies_comparison": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-010",
+    "scenario": "accreditation_audit_response",
+    "query": "The accreditation audit flagged SE400 Software Architecture as outdated. What's the action plan?",
+    "expected_refs": ["CRS-021", "SE400", "REV-008", "ACT-002", "POL-REVIEW-001"],
+    "criteria": {
+      "references_course": true,
+      "references_audit_review": true,
+      "references_action_item": true,
+      "action_steps_present": true,
+      "timeline_mentioned": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-011",
+    "scenario": "low_enrollment_intervention",
+    "query": "Which courses have low enrollment and what should we do about them per policy?",
+    "expected_refs": ["POL-ENROLL-001"],
+    "criteria": {
+      "identifies_low_enrollment_courses": true,
+      "references_enrollment_policy": true,
+      "mentions_thresholds": true,
+      "action_steps_present": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-012",
+    "scenario": "prerequisite_override_request",
+    "query": "A student wants to skip CS201 and go directly to CS301. What does policy say?",
+    "expected_refs": ["POL-PREREQ-001", "CS201", "CS301"],
+    "criteria": {
+      "references_prereq_policy": true,
+      "explains_override_process": true,
+      "mentions_grade_requirement": true,
+      "mentions_chain_restriction": true
+    },
+    "persona": "academic_advisor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-013",
+    "scenario": "capstone_quality_review",
+    "query": "How are our capstone courses performing? What do peer reviews say?",
+    "expected_refs": ["CRS-008", "CRS-015", "REV-011", "REV-015"],
+    "criteria": {
+      "references_capstone_courses": true,
+      "references_peer_reviews": true,
+      "includes_scores": true,
+      "identifies_improvements": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-014",
+    "scenario": "credit_hour_compliance",
+    "query": "Is CS490 Senior Capstone compliant with credit hour policy for a 4-credit course?",
+    "expected_refs": ["CRS-008", "CS490", "POL-CREDIT-001"],
+    "criteria": {
+      "references_course": true,
+      "references_credit_policy": true,
+      "calculates_hours": true,
+      "compliance_stated": true
+    },
+    "persona": "professor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-015",
+    "scenario": "ai_certificate_viability",
+    "query": "Is the AI Certificate program viable? Does it meet certificate requirements?",
+    "expected_refs": ["PRG-AI-CERT", "POL-CERT-001", "CRS-016", "CRS-017"],
+    "criteria": {
+      "references_program": true,
+      "references_cert_policy": true,
+      "evaluates_credit_minimum": true,
+      "evaluates_enrollment": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-016",
+    "scenario": "course_review_cycle",
+    "query": "Which courses are due for their 3-year review cycle?",
+    "expected_refs": ["POL-REVIEW-001"],
+    "criteria": {
+      "references_review_policy": true,
+      "identifies_due_courses": true,
+      "explains_review_requirements": true,
+      "action_steps_present": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-017",
+    "scenario": "online_course_standards",
+    "query": "We want to offer CS101 online. What standards must we meet?",
+    "expected_refs": ["CRS-001", "CS101", "POL-ONLINE-001"],
+    "criteria": {
+      "references_course": true,
+      "references_online_policy": true,
+      "lists_requirements": true,
+      "mentions_doe_guidelines": true
+    },
+    "persona": "professor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-018",
+    "scenario": "data_science_program_health",
+    "query": "Give me a full health check of the Data Science MS program.",
+    "expected_refs": ["PRG-DS-MS"],
+    "criteria": {
+      "references_program": true,
+      "includes_enrollment_data": true,
+      "includes_faculty_load": true,
+      "includes_review_data": true,
+      "priority_order": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  },
+  {
+    "id": "gold-019",
+    "scenario": "transfer_credit_evaluation",
+    "query": "A transfer student has a database course from another school. Can they get credit for CS310?",
+    "expected_refs": ["CRS-004", "CS310", "POL-TRANSFER-001"],
+    "criteria": {
+      "references_course": true,
+      "references_transfer_policy": true,
+      "explains_evaluation_criteria": true,
+      "mentions_overlap_threshold": true
+    },
+    "persona": "academic_advisor",
+    "scope": { "programId": "PRG-CS-BS" }
+  },
+  {
+    "id": "gold-020",
+    "scenario": "department_wide_action_summary",
+    "query": "What are all the open action items across the department and who owns them?",
+    "expected_refs": ["ACT-001", "ACT-002", "ACT-003"],
+    "criteria": {
+      "lists_all_action_items": true,
+      "includes_assignees": true,
+      "includes_priorities": true,
+      "includes_due_dates": true,
+      "priority_order": true
+    },
+    "persona": "department_chair",
+    "scope": { "campusId": "Main Campus" }
+  }
+]

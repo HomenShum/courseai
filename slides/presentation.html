@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280" />
+  <title>CourseAI - Education Course Planning Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", sans-serif;
+      background: #08111f;
+      color: #e5eef8;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .viewport {
+      width: 1280px;
+      height: 720px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.16), transparent 28%),
+        linear-gradient(180deg, #0b1528 0%, #08111f 100%);
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 42px 48px 58px;
+      flex-direction: column;
+    }
+    .slide.active { display: flex; }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #8ab4ff;
+      font-weight: 600;
+    }
+    .title {
+      margin-top: 12px;
+      font-size: 44px;
+      line-height: 1.04;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      max-width: 920px;
+    }
+    .subtitle {
+      margin-top: 14px;
+      max-width: 920px;
+      font-size: 18px;
+      line-height: 1.55;
+      color: #a8bbd2;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+      margin-top: 28px;
+      flex: 1;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .card {
+      background: rgba(14, 23, 39, 0.82);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 22px;
+      padding: 22px 24px;
+      box-shadow: 0 16px 40px rgba(2, 8, 23, 0.22);
+    }
+    .card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #f8fbff;
+    }
+    .card p, .card li {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #bfd0e4;
+    }
+    .card ul {
+      list-style: none;
+      margin-top: 8px;
+    }
+    .card li {
+      padding-left: 14px;
+      position: relative;
+      margin-top: 5px;
+    }
+    .card li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #7dd3fc;
+    }
+    .metric-row {
+      display: flex;
+      gap: 18px;
+      margin-top: 22px;
+    }
+    .metric {
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,0.16);
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.03);
+      min-width: 130px;
+    }
+    .metric-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: #f8fbff;
+    }
+    .metric-label {
+      margin-top: 4px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #8aa0bc;
+    }
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .step {
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.16);
+      background: rgba(255,255,255,0.03);
+      padding: 12px 14px;
+    }
+    .step-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+    .step-title {
+      margin-top: 5px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fbff;
+    }
+    .step-copy {
+      margin-top: 4px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #bfd0e4;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(148,163,184,0.12);
+    }
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #8aa0bc;
+      font-weight: 700;
+    }
+    td {
+      color: #d6e3f3;
+      line-height: 1.5;
+    }
+    .small {
+      font-size: 12px;
+      color: #9db2c9;
+    }
+    .footer {
+      position: absolute;
+      bottom: 18px;
+      left: 48px;
+      right: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #70839a;
+      font-size: 12px;
+    }
+    .nav {
+      display: flex;
+      gap: 8px;
+    }
+    .nav button {
+      font-family: inherit;
+      font-size: 12px;
+      padding: 7px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.18);
+      background: rgba(255,255,255,0.04);
+      color: #d6e3f3;
+      cursor: pointer;
+    }
+    .nav button:hover { background: rgba(255,255,255,0.08); }
+    .accent {
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="viewport">
+    <section class="slide active">
+      <div class="eyebrow">CourseAI / Slide 1</div>
+      <h1 class="title">Curriculum AI for professors and department chairs who need answers with evidence.</h1>
+      <p class="subtitle">
+        CourseAI turns scattered enrollment data, accreditation policies, student evaluations, prerequisite chains,
+        and curriculum gap analyses into one faculty workspace with grounded guidance and tracked follow-through.
+      </p>
+
+      <div class="metric-row">
+        <div class="metric">
+          <div class="metric-value">6</div>
+          <div class="metric-label">Demo programs</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">25</div>
+          <div class="metric-label">Seeded courses</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">20</div>
+          <div class="metric-label">Golden evals</div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3>Professor view</h3>
+          <ul>
+            <li>Single-program course management</li>
+            <li>Enrollment trends and student feedback</li>
+            <li>Prerequisite chain analysis</li>
+            <li>Course proposal and document upload</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Department chair view</h3>
+          <ul>
+            <li>Cross-program curriculum oversight</li>
+            <li>Faculty load balancing and overload detection</li>
+            <li>Accreditation compliance monitoring</li>
+            <li>Curriculum gap identification and resolution</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Shared collaboration</h3>
+          <ul>
+            <li>Centered group chat for faculty</li>
+            <li>Right-side agent rail for trace and sources</li>
+            <li>Shared session replay with durable events</li>
+            <li>Audit-ready answers and quality metadata</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">CourseAI / Slide 2</div>
+      <h1 class="title">The product is more than chat: it is an evented curriculum workspace with evaluation built in.</h1>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Architecture flow</h3>
+          <div class="pipeline">
+            <div class="step">
+              <div class="step-label">Step 1</div>
+              <div class="step-title">Convex as canonical state</div>
+              <div class="step-copy">Programs, courses, enrollment, faculty, policies, reviews, action items, messages, and audit logs live in one backend.</div>
+            </div>
+            <div class="step">
+              <div class="step-label">Step 2</div>
+              <div class="step-title">Scoped evidence retrieval</div>
+              <div class="step-copy">The agent loads a bounded course and policy packet instead of writing from a vague context blob.</div>
+            </div>
+            <div class="step">
+              <div class="step-label">Step 3</div>
+              <div class="step-title">Gemini tool calling</div>
+              <div class="step-copy">10 internal tools handle curriculum facts first. Google Search grounding is only used when fresh external context materially helps.</div>
+            </div>
+            <div class="step">
+              <div class="step-label">Step 4</div>
+              <div class="step-title">Durable streaming</div>
+              <div class="step-copy">The UI subscribes to messageEvents, so users see plan creation, execution progress, streamed text, sources, and quality checks in the assistant rail.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Evaluation and trust loop</h3>
+          <div class="pipeline">
+            <div class="step">
+              <div class="step-label">Live runtime</div>
+              <div class="step-title">agent:chat is the thing being judged</div>
+              <div class="step-copy">No mocked eval harness. The same retrieval, tool calling, fallback, and quality path used in the product is what gets scored.</div>
+            </div>
+            <div class="step">
+              <div class="step-label">Golden references</div>
+              <div class="step-title">Preferred curriculum responses</div>
+              <div class="step-copy">20 golden scenarios score factual alignment, actionability, groundedness, policy compliance, and required reference coverage.</div>
+            </div>
+            <div class="step">
+              <div class="step-label">Faculty review</div>
+              <div class="step-title">Trace, telemetry, sources, quality</div>
+              <div class="step-copy">The assistant rail is part of the trust model, not just a debug panel.</div>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric">
+              <div class="metric-value">8</div>
+              <div class="metric-label">Quality checks per answer</div>
+            </div>
+            <div class="metric">
+              <div class="metric-value">10</div>
+              <div class="metric-label">Internal tools</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">CourseAI / Slide 3</div>
+      <h1 class="title">The key design tradeoffs were about curriculum workflow fit, not chasing the flashiest stack.</h1>
+
+      <div class="card" style="margin-top: 22px;">
+        <h3>Stack decisions</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Decision</th>
+              <th>Why it won</th>
+              <th>Tradeoff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="accent">Convex-first backend</span></td>
+              <td>Realtime courses, enrollment, faculty, messages, streaming state, and audit logs all live together.</td>
+              <td>Dedicated vector systems can be stronger on retrieval depth, but retrieval is not the whole product here.</td>
+            </tr>
+            <tr>
+              <td><span class="accent">Harnessed agent, not one-shot chat</span></td>
+              <td>Bounded evidence + tool calls + trace + quality checks gives much better academic trust.</td>
+              <td>More engineering work than a single LLM call.</td>
+            </tr>
+            <tr>
+              <td><span class="accent">Pro-class model selectively</span></td>
+              <td>Broader department synthesis and complex prerequisite analyses benefit from stronger reasoning.</td>
+              <td>Routine cases can often move to cheaper planner or deterministic paths later.</td>
+            </tr>
+            <tr>
+              <td><span class="accent">Durable streaming over plain SSE</span></td>
+              <td>Replay, auditability, and faculty-visible progress mattered more than the fastest possible demo setup.</td>
+              <td>More backend and UI complexity.</td>
+            </tr>
+            <tr>
+              <td><span class="accent">Deterministic fallback for single-course queries</span></td>
+              <td>When a course + policy match is high-confidence, render directly from structured data without LLM latency.</td>
+              <td>Less flexible for ambiguous queries, but faster and more reliable for common cases.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2" style="margin-top: 18px;">
+        <div class="card">
+          <h3>What a reviewer can ask next</h3>
+          <ul>
+            <li>How would you move more traffic to deterministic or Flash-class paths?</li>
+            <li>When would you add GraphRAG for prerequisite chain reasoning?</li>
+            <li>What changes when real university SSO replaces demo sessions?</li>
+            <li>How would you productionize accreditation report generation?</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Links</h3>
+          <p><strong>Repo:</strong> README, golden dataset, slide deck, and architecture docs are all checked in.</p>
+          <p style="margin-top: 10px;"><strong>Live demo:</strong> review the course workspace, department dashboard, and the /chat route for the faculty channel plus assistant rail.</p>
+          <p style="margin-top: 10px;" class="small">CourseAI demonstrates how domain-specific AI tooling can ground curriculum decisions in enrollment data, accreditation policies, and student feedback.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div id="counter">1 / 3</div>
+      <div class="nav">
+        <button id="prev">Prev</button>
+        <button id="next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const counter = document.getElementById("counter");
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+    let index = 0;
+
+    const render = () => {
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+      counter.textContent = `${index + 1} / ${slides.length}`;
+    };
+
+    prev.addEventListener("click", () => {
+      index = (index - 1 + slides.length) % slides.length;
+      render();
+    });
+
+    next.addEventListener("click", () => {
+      index = (index + 1) % slides.length;
+      render();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown") {
+        index = (index + 1) % slides.length;
+        render();
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        index = (index - 1 + slides.length) % slides.length;
+        render();
+      }
+    });
+  </script>
+</body>
+</html>
