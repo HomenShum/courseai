@@ -4,264 +4,495 @@ export const seedAll = mutation({
   args: {},
   handler: async (ctx) => {
     const hasUsers = Boolean(await ctx.db.query("users").first());
-    const hasPrograms = Boolean(await ctx.db.query("programs").first());
-    const hasCourses = Boolean(await ctx.db.query("courses").first());
-    const hasEnrollment = Boolean(await ctx.db.query("enrollment").first());
-    const hasFaculty = Boolean(await ctx.db.query("faculty").first());
-    const hasPolicies = Boolean(await ctx.db.query("curricularPolicies").first());
-    const hasReviews = Boolean(await ctx.db.query("reviews").first());
+    const hasStores = Boolean(await ctx.db.query("stores").first());
+    const hasIssues = Boolean(await ctx.db.query("issues").first());
+    const hasInventory = Boolean(await ctx.db.query("inventory").first());
+    const hasStaffing = Boolean(await ctx.db.query("staffing").first());
+    const hasPolicies = Boolean(await ctx.db.query("policies").first());
+    const hasResolutions = Boolean(await ctx.db.query("resolutions").first());
     const hasActionItems = Boolean(await ctx.db.query("actionItems").first());
 
-    // === USERS ===
     const users = [
       {
-        operatorId: "OP-PROF-CS",
-        name: "Dr. Sarah Mitchell",
-        email: "sarah.mitchell@university.edu",
-        role: "professor",
-        programIds: ["PRG-CS-BS"],
-        campusIds: ["Main Campus"],
+        operatorId: "OP-STR-101",
+        name: "Maria Chen",
+        email: "maria.chen@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-101"],
+        regionIds: ["REG-NE"],
       },
       {
-        operatorId: "OP-PROF-DS",
-        name: "Dr. David Chen",
-        email: "david.chen@university.edu",
-        role: "professor",
-        programIds: ["PRG-DS-MS"],
-        campusIds: ["Main Campus"],
+        operatorId: "OP-STR-102",
+        name: "David Park",
+        email: "david.park@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-102"],
+        regionIds: ["REG-NE"],
       },
       {
-        operatorId: "OP-CHAIR",
-        name: "Dr. Lisa Ramirez",
-        email: "lisa.ramirez@university.edu",
-        role: "department_chair",
-        programIds: [],
-        campusIds: ["Main Campus", "Satellite Campus", "ALL"],
+        operatorId: "OP-STR-103",
+        name: "Lisa Nguyen",
+        email: "lisa.nguyen@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-103"],
+        regionIds: ["REG-NE"],
       },
       {
-        operatorId: "OP-ADVISOR",
-        name: "Jordan Hayes",
-        email: "jordan.hayes@university.edu",
-        role: "academic_advisor",
-        programIds: ["PRG-CS-BS", "PRG-DS-MS", "PRG-AI-CERT", "PRG-SE-BS", "PRG-CS-SAT", "PRG-SE-SAT"],
-        campusIds: ["Main Campus", "Satellite Campus", "ALL"],
+        operatorId: "OP-STR-104",
+        name: "James Wright",
+        email: "james.wright@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-104"],
+        regionIds: ["REG-NE"],
+      },
+      {
+        operatorId: "OP-STR-105",
+        name: "Priya Sharma",
+        email: "priya.sharma@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-105"],
+        regionIds: ["REG-NE"],
+      },
+      {
+        operatorId: "OP-STR-106",
+        name: "Robert Kim",
+        email: "robert.kim@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-106"],
+        regionIds: ["REG-NE"],
+      },
+      {
+        operatorId: "OP-STR-107",
+        name: "Angela Torres",
+        email: "angela.torres@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-107"],
+        regionIds: ["REG-NE"],
+      },
+      {
+        operatorId: "OP-STR-108",
+        name: "Carlos Mendez",
+        email: "carlos.mendez@corp.local",
+        role: "store_manager",
+        storeIds: ["STR-108"],
+        regionIds: ["REG-NE"],
+      },
+      {
+        operatorId: "OP-REG-NE",
+        name: "Sandra Williams",
+        email: "sandra.williams@corp.local",
+        role: "regional_manager",
+        storeIds: [],
+        regionIds: ["REG-NE"],
       },
     ];
     if (!hasUsers) {
       for (const user of users) await ctx.db.insert("users", user);
     }
 
-    // === PROGRAMS ===
-    const programs = [
-      { programId: "PRG-CS-BS", name: "Computer Science BS", department: "Computer Science", degreeType: "BS", accreditationStatus: "accredited", totalCredits: 120, campus: "Main Campus", chairId: "OP-CHAIR" },
-      { programId: "PRG-DS-MS", name: "Data Science MS", department: "Computer Science", degreeType: "MS", accreditationStatus: "accredited", totalCredits: 36, campus: "Main Campus", chairId: "OP-CHAIR" },
-      { programId: "PRG-AI-CERT", name: "AI Certificate", department: "Computer Science", degreeType: "certificate", accreditationStatus: "provisional", totalCredits: 18, campus: "Main Campus", chairId: "OP-CHAIR" },
-      { programId: "PRG-SE-BS", name: "Software Engineering BS", department: "Computer Science", degreeType: "BS", accreditationStatus: "accredited", totalCredits: 124, campus: "Main Campus", chairId: "OP-CHAIR" },
-      { programId: "PRG-CS-SAT", name: "Computer Science BS (Satellite)", department: "Computer Science", degreeType: "BS", accreditationStatus: "under_review", totalCredits: 120, campus: "Satellite Campus", chairId: "OP-CHAIR" },
-      { programId: "PRG-SE-SAT", name: "Software Engineering BS (Satellite)", department: "Computer Science", degreeType: "BS", accreditationStatus: "accredited", totalCredits: 124, campus: "Satellite Campus", chairId: "OP-CHAIR" },
+    // === STORES ===
+    const stores = [
+      { storeId: "STR-101", name: "Greenfield Plaza", address: "142 Greenfield Ave, Hartford, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "Maria Chen" },
+      { storeId: "STR-102", name: "Elm Street Market", address: "78 Elm St, New Haven, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "David Park" },
+      { storeId: "STR-103", name: "Harbor View", address: "310 Harbor Rd, Bridgeport, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "Lisa Nguyen" },
+      { storeId: "STR-104", name: "Riverside Commons", address: "55 River Rd, Stamford, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "James Wright" },
+      { storeId: "STR-105", name: "College Town Express", address: "201 College St, New Haven, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "Priya Sharma" },
+      { storeId: "STR-106", name: "Downtown Central", address: "400 Main St, Hartford, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "Robert Kim" },
+      { storeId: "STR-107", name: "Lakeside Fresh", address: "88 Lake Ave, West Hartford, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "Angela Torres" },
+      { storeId: "STR-108", name: "Westfield Junction", address: "120 Westfield Rd, Meriden, CT", regionId: "REG-NE", regionName: "Northeast", managerName: "Carlos Mendez" },
     ];
-    if (!hasPrograms) {
-      for (const program of programs) await ctx.db.insert("programs", program);
+    if (!hasStores) {
+      for (const s of stores) await ctx.db.insert("stores", s);
     }
 
-    // === COURSES ===
-    const courses = [
-      { courseId: "CRS-001", programId: "PRG-CS-BS", courseCode: "CS101", title: "Introduction to Computer Science", credits: 3, description: "Foundational course covering computational thinking, algorithms, and Python programming basics.", type: "core", status: "active", prerequisites: [], semester: "Fall 2026", enrollmentCap: 120, learningOutcomes: ["Understand algorithmic thinking", "Write basic Python programs", "Analyze problem complexity"], instructorName: "Dr. Sarah Mitchell" },
-      { courseId: "CRS-002", programId: "PRG-CS-BS", courseCode: "CS201", title: "Data Structures and Algorithms", credits: 4, description: "In-depth study of data structures including trees, graphs, hash tables, and algorithm design paradigms.", type: "core", status: "active", prerequisites: ["CS101"], semester: "Spring 2026", enrollmentCap: 80, learningOutcomes: ["Implement core data structures", "Analyze time and space complexity", "Apply dynamic programming"], instructorName: "Dr. Sarah Mitchell" },
-      { courseId: "CRS-003", programId: "PRG-CS-BS", courseCode: "CS301", title: "Operating Systems", credits: 3, description: "Process management, memory management, file systems, and concurrent programming.", type: "core", status: "active", prerequisites: ["CS201"], semester: "Fall 2026", enrollmentCap: 60, learningOutcomes: ["Understand process scheduling", "Implement synchronization primitives", "Design memory management schemes"], instructorName: "Dr. Robert Kim" },
-      { courseId: "CRS-004", programId: "PRG-CS-BS", courseCode: "CS310", title: "Database Systems", credits: 3, description: "Relational databases, SQL, normalization, transaction processing, and NoSQL alternatives.", type: "core", status: "active", prerequisites: ["CS201"], semester: "Spring 2026", enrollmentCap: 70, learningOutcomes: ["Design normalized schemas", "Write complex SQL queries", "Evaluate NoSQL tradeoffs"], instructorName: "Dr. Emily Wang" },
-      { courseId: "CRS-005", programId: "PRG-CS-BS", courseCode: "CS350", title: "Software Engineering", credits: 3, description: "Software development lifecycle, agile methodologies, testing strategies, and team collaboration.", type: "core", status: "active", prerequisites: ["CS201"], semester: "Fall 2026", enrollmentCap: 60, learningOutcomes: ["Apply agile development practices", "Write comprehensive test suites", "Conduct code reviews"], instructorName: "Dr. James Park" },
-      { courseId: "CRS-006", programId: "PRG-CS-BS", courseCode: "CS401", title: "Machine Learning Fundamentals", credits: 3, description: "Supervised and unsupervised learning, neural networks, model evaluation, and ethical AI.", type: "elective", status: "active", prerequisites: ["CS201", "MATH301"], semester: "Fall 2026", enrollmentCap: 45, learningOutcomes: ["Train and evaluate ML models", "Apply regularization techniques", "Assess model fairness"], instructorName: "Dr. David Chen" },
-      { courseId: "CRS-007", programId: "PRG-CS-BS", courseCode: "CS410", title: "Computer Networks", credits: 3, description: "Network protocols, TCP/IP stack, routing algorithms, and network security fundamentals.", type: "elective", status: "active", prerequisites: ["CS301"], semester: "Spring 2026", enrollmentCap: 50, learningOutcomes: ["Analyze protocol behavior", "Design network architectures", "Implement socket programming"], instructorName: "Dr. Robert Kim" },
-      { courseId: "CRS-008", programId: "PRG-CS-BS", courseCode: "CS490", title: "Senior Capstone Project", credits: 4, description: "Team-based capstone integrating knowledge from core courses into a substantial software project.", type: "capstone", status: "active", prerequisites: ["CS350", "CS310"], semester: "Spring 2026", enrollmentCap: 30, learningOutcomes: ["Deliver production-quality software", "Present technical work professionally", "Manage project scope and timeline"], instructorName: "Dr. Sarah Mitchell" },
-      { courseId: "CRS-009", programId: "PRG-CS-BS", courseCode: "CS210", title: "Computer Architecture", credits: 3, description: "Digital logic, processor design, memory hierarchy, and instruction set architectures.", type: "core", status: "active", prerequisites: ["CS101"], semester: "Fall 2026", enrollmentCap: 65, learningOutcomes: ["Design basic processor pipelines", "Analyze cache performance", "Understand ISA tradeoffs"], instructorName: "Dr. Angela Torres" },
-      { courseId: "CRS-010", programId: "PRG-CS-BS", courseCode: "CS420", title: "Cybersecurity", credits: 3, description: "Threat modeling, cryptography, secure software development, and incident response.", type: "elective", status: "under_review", prerequisites: ["CS301", "CS410"], semester: "Fall 2026", enrollmentCap: 40, learningOutcomes: ["Perform threat analysis", "Apply cryptographic primitives", "Design secure systems"], instructorName: "Dr. Robert Kim" },
-      { courseId: "CRS-011", programId: "PRG-DS-MS", courseCode: "DS501", title: "Statistical Learning", credits: 3, description: "Advanced regression, classification, dimensionality reduction, and Bayesian methods for data science.", type: "core", status: "active", prerequisites: [], semester: "Fall 2026", enrollmentCap: 35, learningOutcomes: ["Apply advanced regression models", "Implement Bayesian inference", "Evaluate model selection criteria"], instructorName: "Dr. David Chen" },
-      { courseId: "CRS-012", programId: "PRG-DS-MS", courseCode: "DS510", title: "Big Data Systems", credits: 3, description: "Distributed computing frameworks, data pipelines, and scalable storage architectures.", type: "core", status: "active", prerequisites: [], semester: "Spring 2026", enrollmentCap: 30, learningOutcomes: ["Design MapReduce pipelines", "Optimize Spark workloads", "Evaluate storage tradeoffs"], instructorName: "Dr. Emily Wang" },
-      { courseId: "CRS-013", programId: "PRG-DS-MS", courseCode: "DS520", title: "Natural Language Processing", credits: 3, description: "Text processing, language models, transformers, and applications in information extraction.", type: "elective", status: "active", prerequisites: ["DS501"], semester: "Fall 2026", enrollmentCap: 25, learningOutcomes: ["Fine-tune language models", "Build text classification pipelines", "Evaluate NLP metrics"], instructorName: "Dr. David Chen" },
-      { courseId: "CRS-014", programId: "PRG-DS-MS", courseCode: "DS530", title: "Data Visualization and Communication", credits: 3, description: "Principles of effective data visualization, storytelling with data, and interactive dashboards.", type: "elective", status: "active", prerequisites: [], semester: "Spring 2026", enrollmentCap: 30, learningOutcomes: ["Create effective visualizations", "Design interactive dashboards", "Present data-driven insights"], instructorName: "Dr. Maria Santos" },
-      { courseId: "CRS-015", programId: "PRG-DS-MS", courseCode: "DS590", title: "Data Science Capstone", credits: 4, description: "Applied research project solving a real-world data science problem with industry partnership.", type: "capstone", status: "active", prerequisites: ["DS501", "DS510"], semester: "Spring 2026", enrollmentCap: 20, learningOutcomes: ["Deliver end-to-end data project", "Communicate results to stakeholders", "Handle messy real-world data"], instructorName: "Dr. David Chen" },
-      { courseId: "CRS-016", programId: "PRG-AI-CERT", courseCode: "AI450", title: "Applied Deep Learning", credits: 3, description: "Convolutional and recurrent networks, transfer learning, and deployment of deep learning models.", type: "core", status: "active", prerequisites: [], semester: "Fall 2026", enrollmentCap: 30, learningOutcomes: ["Train deep neural networks", "Apply transfer learning", "Deploy models to production"], instructorName: "Dr. David Chen" },
-      { courseId: "CRS-017", programId: "PRG-AI-CERT", courseCode: "AI460", title: "AI Ethics and Governance", credits: 3, description: "Fairness, accountability, transparency in AI systems, and regulatory frameworks.", type: "core", status: "active", prerequisites: [], semester: "Spring 2026", enrollmentCap: 35, learningOutcomes: ["Assess algorithmic bias", "Apply fairness metrics", "Navigate AI regulations"], instructorName: "Dr. Lisa Ramirez" },
-      { courseId: "CRS-018", programId: "PRG-AI-CERT", courseCode: "AI470", title: "Reinforcement Learning", credits: 3, description: "Markov decision processes, Q-learning, policy gradient methods, and multi-agent systems.", type: "elective", status: "proposed", prerequisites: ["AI450"], semester: "Fall 2026", enrollmentCap: 25, learningOutcomes: ["Implement Q-learning agents", "Apply policy gradient methods", "Design reward functions"], instructorName: "Dr. David Chen" },
-      { courseId: "CRS-019", programId: "PRG-SE-BS", courseCode: "SE200", title: "Object-Oriented Design", credits: 3, description: "Design patterns, SOLID principles, UML modeling, and refactoring techniques.", type: "core", status: "active", prerequisites: ["CS101"], semester: "Spring 2026", enrollmentCap: 55, learningOutcomes: ["Apply design patterns", "Model systems with UML", "Refactor legacy code"], instructorName: "Dr. James Park" },
-      { courseId: "CRS-020", programId: "PRG-SE-BS", courseCode: "SE340", title: "DevOps and Cloud Computing", credits: 3, description: "CI/CD pipelines, containerization, infrastructure as code, and cloud platform services.", type: "elective", status: "active", prerequisites: ["CS350"], semester: "Fall 2026", enrollmentCap: 40, learningOutcomes: ["Build CI/CD pipelines", "Deploy containerized applications", "Manage cloud infrastructure"], instructorName: "Dr. James Park" },
-      { courseId: "CRS-021", programId: "PRG-SE-BS", courseCode: "SE400", title: "Software Architecture", credits: 3, description: "Architectural styles, microservices, event-driven design, and quality attribute tradeoffs.", type: "core", status: "under_review", prerequisites: ["SE200", "CS350"], semester: "Fall 2026", enrollmentCap: 35, learningOutcomes: ["Evaluate architectural styles", "Design microservice systems", "Analyze quality attribute tradeoffs"], instructorName: "Dr. Angela Torres" },
-      { courseId: "CRS-022", programId: "PRG-CS-SAT", courseCode: "CS101S", title: "Introduction to Computer Science (Satellite)", credits: 3, description: "Same curriculum as CS101 delivered at the satellite campus with evening sections.", type: "core", status: "active", prerequisites: [], semester: "Fall 2026", enrollmentCap: 60, learningOutcomes: ["Understand algorithmic thinking", "Write basic Python programs", "Analyze problem complexity"], instructorName: "Dr. Michael Torres" },
-      { courseId: "CRS-023", programId: "PRG-CS-SAT", courseCode: "CS201S", title: "Data Structures (Satellite)", credits: 4, description: "Data structures and algorithms for the satellite campus program.", type: "core", status: "active", prerequisites: ["CS101S"], semester: "Spring 2026", enrollmentCap: 40, learningOutcomes: ["Implement core data structures", "Analyze time and space complexity", "Apply dynamic programming"], instructorName: "Dr. Michael Torres" },
-      { courseId: "CRS-024", programId: "PRG-SE-SAT", courseCode: "SE200S", title: "Object-Oriented Design (Satellite)", credits: 3, description: "Design patterns and OO principles for satellite campus SE students.", type: "core", status: "active", prerequisites: ["CS101S"], semester: "Fall 2026", enrollmentCap: 35, learningOutcomes: ["Apply design patterns", "Model systems with UML", "Refactor legacy code"], instructorName: "Dr. Ana Lopez" },
-      { courseId: "CRS-025", programId: "PRG-CS-BS", courseCode: "CS430", title: "Cloud-Native Application Development", credits: 3, description: "Serverless computing, edge functions, and modern web application architectures.", type: "elective", status: "proposed", prerequisites: ["CS350"], semester: "Spring 2026", enrollmentCap: 35, learningOutcomes: ["Build serverless applications", "Design event-driven architectures", "Optimize for edge deployment"], instructorName: "Dr. James Park" },
+    // === ISSUES (all 20 from synthetic dataset) ===
+    const issues = [
+      {
+        issueId: "ISS-001", storeId: "STR-101", issueType: "inventory_gap", severity: "high",
+        title: "Organic milk shortage — supplier missed 2 deliveries",
+        description: "Horizon Organic 64oz whole milk (SKU-4411) out of stock 3 days. DairyFresh Co missed deliveries on 4/10 and 4/12. ~120 units/week demand. Neighboring store (Elm Street) also affected.",
+        category: "inventory", status: "open", createdAt: "2026-04-12T09:15:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-INV-003", affectedSku: "SKU-4411",
+        estimatedRevenueImpact: 480, reportedByRole: "store_manager", reporterName: "Maria Chen",
+      },
+      {
+        issueId: "ISS-002", storeId: "STR-102", issueType: "inventory_gap", severity: "medium",
+        title: "Same organic milk supplier delay — DairyFresh Co",
+        description: "Confirming same issue as Greenfield Plaza. DairyFresh Co no-showed twice. 8 units left, ~1 day of stock. Need emergency substitute supplier authorization.",
+        category: "inventory", status: "open", createdAt: "2026-04-12T10:30:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-INV-003", affectedSku: "SKU-4411",
+        estimatedRevenueImpact: 360, reportedByRole: "store_manager", reporterName: "David Park",
+      },
+      {
+        issueId: "ISS-003", storeId: "STR-103", issueType: "staffing", severity: "critical",
+        title: "3 call-outs on Saturday — cannot cover floor",
+        description: "Three associates called out for Saturday shift. Only 4 of 7 showed. Bakery and deli unstaffed. Need overtime approval + emergency temp staffing.",
+        category: "staffing", status: "in_progress", createdAt: "2026-04-12T06:45:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-HR-007", affectedSku: undefined,
+        estimatedRevenueImpact: 2200, reportedByRole: "store_manager", reporterName: "Lisa Nguyen",
+      },
+      {
+        issueId: "ISS-004", storeId: "STR-104", issueType: "equipment_failure", severity: "critical",
+        title: "Walk-in cooler temperature alarm — perishables at risk",
+        description: "Walk-in cooler #2 at 52°F (should be 35-38°F). Compressor noise. ~$8K dairy/produce at risk. HVAC vendor (CoolTech) earliest Monday. Need emergency vendor authorization.",
+        category: "equipment", status: "open", createdAt: "2026-04-12T04:20:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-MAINT-001", affectedSku: undefined,
+        estimatedRevenueImpact: 8000, reportedByRole: "store_manager", reporterName: "James Wright",
+      },
+      {
+        issueId: "ISS-005", storeId: "STR-101", issueType: "compliance", severity: "medium",
+        title: "Health inspection scheduled for next week — prep checklist incomplete",
+        description: "County health inspector visit confirmed 4/18. Three items open: handwashing log gaps 4/8-4/10, thermometer calibration overdue in deli, March pest control report not filed.",
+        category: "compliance", status: "in_progress", createdAt: "2026-04-11T14:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-COMP-002", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "store_manager", reporterName: "Maria Chen",
+      },
+      {
+        issueId: "ISS-006", storeId: "STR-105", issueType: "operational", severity: "low",
+        title: "Planogram reset delayed — seasonal endcap transition",
+        description: "Spring seasonal endcap transition due 4/7, still showing winter clearance. Team lacks bandwidth due to inventory counts. Requesting 3-day extension or regional merchandising support.",
+        category: "operational", status: "open", createdAt: "2026-04-11T11:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-MERCH-004", affectedSku: undefined,
+        estimatedRevenueImpact: 150, reportedByRole: "store_manager", reporterName: "Priya Sharma",
+      },
+      {
+        issueId: "ISS-007", storeId: "STR-106", issueType: "customer_escalation", severity: "high",
+        title: "Customer slip-and-fall incident — legal documentation needed",
+        description: "Customer slip near produce wet floor at 2:15 PM. Incident report filed. Customer mentioned contacting attorney. Security footage preserved. Need corporate legal notification timeline.",
+        category: "safety", status: "open", createdAt: "2026-04-11T14:30:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-SAFETY-001", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "store_manager", reporterName: "Robert Kim",
+      },
+      {
+        issueId: "ISS-008", storeId: "STR-102", issueType: "inventory_gap", severity: "low",
+        title: "Seasonal allergy medicine display empty — vendor managed",
+        description: "Claritin and Zyrtec vendor-managed display empty. Vendor (Johnson Distribution) usually restocks Wednesdays, last restock skipped. Allergy season peak.",
+        category: "inventory", status: "open", createdAt: "2026-04-10T16:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-INV-005", affectedSku: "SKU-7823",
+        estimatedRevenueImpact: 320, reportedByRole: "store_manager", reporterName: "David Park",
+      },
+      {
+        issueId: "ISS-009", storeId: "STR-103", issueType: "staffing", severity: "medium",
+        title: "New hire onboarding delayed — POS training backlog",
+        description: "Two new hires started 4/7 but can't operate registers. Training module system down 4/7-4/9. Bagging only. Need register-certified before weekend.",
+        category: "staffing", status: "in_progress", createdAt: "2026-04-10T09:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-HR-012", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "store_manager", reporterName: "Lisa Nguyen",
+      },
+      {
+        issueId: "ISS-010", storeId: "STR-107", issueType: "theft_shrinkage", severity: "high",
+        title: "Organized retail theft — cosmetics section hit 3 times this week",
+        description: "Third coordinated grab-and-run in cosmetics. ~$1,200 losses this week. LP camera caught 2 individuals. Police reports filed. Requesting anti-theft fixture budget.",
+        category: "shrinkage", status: "open", createdAt: "2026-04-12T08:00:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-LP-003", affectedSku: undefined,
+        estimatedRevenueImpact: 1200, reportedByRole: "store_manager", reporterName: "Angela Torres",
+      },
+      {
+        issueId: "ISS-011", storeId: "STR-104", issueType: "operational", severity: "medium",
+        title: "Self-checkout lane 3 and 5 error loops — customer frustration",
+        description: "Two of six SCO lanes throwing card reader errors intermittently. Customers abandoning SCO for staffed lanes. IT ticket #IT-88421 open since 4/8, no response.",
+        category: "equipment", status: "open", createdAt: "2026-04-10T13:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-IT-002", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "store_manager", reporterName: "James Wright",
+      },
+      {
+        issueId: "ISS-012", storeId: "STR-108", issueType: "inventory_gap", severity: "critical",
+        title: "Warehouse delivery 6 hours late — fresh produce wilting on truck",
+        description: "Scheduled 5AM delivery arrived 11AM. Truck refrigeration marginal. Lettuce, berries, cut fruit borderline. Need quality inspection guidance — accept partial, reject all, or document with discount claim?",
+        category: "inventory", status: "open", createdAt: "2026-04-12T11:15:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-INV-008", affectedSku: "SKU-MULTI",
+        estimatedRevenueImpact: 3500, reportedByRole: "store_manager", reporterName: "Carlos Mendez",
+      },
+      {
+        issueId: "ISS-013", storeId: "STR-105", issueType: "customer_escalation", severity: "medium",
+        title: "Online order pickup — 4 orders unfulfillable due to out-of-stock",
+        description: "Four BOPIS orders can't be fulfilled — items show in-stock in system but shelf empty. Customers arriving expecting orders. Inventory vs physical count mismatch.",
+        category: "operational", status: "in_progress", createdAt: "2026-04-11T15:30:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-ECOM-001", affectedSku: "SKU-MULTI",
+        estimatedRevenueImpact: 280, reportedByRole: "store_manager", reporterName: "Priya Sharma",
+      },
+      {
+        issueId: "ISS-014", storeId: "STR-106", issueType: "compliance", severity: "high",
+        title: "Fire exit blocked by delivery pallets — code violation",
+        description: "Morning delivery crew left 4 pallets blocking rear fire exit. Second time in 30 days. Need formal vendor warning + fire marshal documentation.",
+        category: "compliance", status: "resolved", createdAt: "2026-04-09T07:00:00Z",
+        resolvedAt: "2026-04-09T07:45:00Z",
+        resolutionNotes: "Pallets cleared in 45 min. Vendor (QuickShip Logistics) issued written warning. Photo documentation filed. Added to delivery SOP checklist.",
+        escalatedToRegional: false, relatedPolicy: "POL-SAFETY-005", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "store_manager", reporterName: "Robert Kim",
+      },
+      {
+        issueId: "ISS-015", storeId: "STR-101", issueType: "staffing", severity: "low",
+        title: "Employee requesting ADA accommodation — ergonomic equipment",
+        description: "Long-term associate (12 years) submitted ADA accommodation request for standing desk mat and modified lifting restrictions. Need HR guidance on approval process.",
+        category: "staffing", status: "open", createdAt: "2026-04-10T10:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-HR-015", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "store_manager", reporterName: "Maria Chen",
+      },
+      {
+        issueId: "ISS-016", storeId: "STR-107", issueType: "operational", severity: "medium",
+        title: "Competitor opened across the street — pricing intelligence needed",
+        description: "New discount grocery (FreshMart) opened 4/5. 10-15% foot traffic drop. Price comparison on 20 staples shows we're 8-22% higher on 14 items. Requesting competitive response guidance.",
+        category: "competitive", status: "open", createdAt: "2026-04-10T12:00:00Z",
+        escalatedToRegional: true, relatedPolicy: "POL-PRICING-001", affectedSku: undefined,
+        estimatedRevenueImpact: 5000, reportedByRole: "store_manager", reporterName: "Angela Torres",
+      },
+      {
+        issueId: "ISS-017", storeId: "STR-108", issueType: "equipment_failure", severity: "low",
+        title: "Shopping cart corral — 12 carts with broken wheels",
+        description: "12 carts with locked/broken wheels. Customers grab and return immediately. Cart vendor minimum replacement is 20. Requesting approval or interim solution.",
+        category: "equipment", status: "open", createdAt: "2026-04-08T09:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-MAINT-006", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "store_manager", reporterName: "Carlos Mendez",
+      },
+      {
+        issueId: "ISS-018", storeId: "STR-ALL", issueType: "cross_store_pattern", severity: "high",
+        title: "Regional pattern: DairyFresh Co affecting 4+ stores — vendor review",
+        description: "DairyFresh Co delivery failures across Greenfield (ISS-001), Elm Street (ISS-002), and 2 stores in adjacent region. Systemic vendor issue. Initiating 30-day vendor performance review.",
+        category: "vendor_management", status: "in_progress", createdAt: "2026-04-12T11:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-VENDOR-001", affectedSku: "SKU-4411",
+        estimatedRevenueImpact: 4200, reportedByRole: "regional_manager", reporterName: "Sandra Williams",
+      },
+      {
+        issueId: "ISS-019", storeId: "STR-ALL", issueType: "strategic", severity: "medium",
+        title: "Q2 shrinkage trending 15% above target — action plan needed",
+        description: "Regional shrinkage at 2.3% vs 2.0% target. Lakeside (STR-107) outlier at 3.1%. Need store-by-store breakdown, accelerated LP audits for top 3 stores, region comparison.",
+        category: "shrinkage", status: "open", createdAt: "2026-04-11T08:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-LP-001", affectedSku: undefined,
+        estimatedRevenueImpact: 45000, reportedByRole: "regional_manager", reporterName: "Sandra Williams",
+      },
+      {
+        issueId: "ISS-020", storeId: "STR-ALL", issueType: "strategic", severity: "low",
+        title: "Summer hiring pipeline — seasonal staffing forecast",
+        description: "Summer volume starts mid-May. Need 40-50 seasonal hires across 8 stores. Last year started recruiting 4/15, still had June gaps. Need headcount forecast, job fair coordination, training schedule.",
+        category: "staffing", status: "open", createdAt: "2026-04-09T10:00:00Z",
+        escalatedToRegional: false, relatedPolicy: "POL-HR-020", affectedSku: undefined,
+        estimatedRevenueImpact: 0, reportedByRole: "regional_manager", reporterName: "Sandra Williams",
+      },
     ];
-    if (!hasCourses) {
-      for (const course of courses) await ctx.db.insert("courses", course);
+    if (!hasIssues) {
+      for (const i of issues) await ctx.db.insert("issues", i as any);
     }
 
-    // === ENROLLMENT ===
-    const enrollmentRecords = [
-      // Fall 2025
-      { courseId: "CRS-001", semester: "Fall 2025", enrolled: 115, capacity: 120, waitlist: 8, completionRate: 0.91, avgGrade: 3.2, dropRate: 0.06 },
-      { courseId: "CRS-002", semester: "Fall 2025", enrolled: 72, capacity: 80, waitlist: 3, completionRate: 0.85, avgGrade: 2.9, dropRate: 0.10 },
-      { courseId: "CRS-003", semester: "Fall 2025", enrolled: 55, capacity: 60, waitlist: 5, completionRate: 0.82, avgGrade: 2.8, dropRate: 0.12 },
-      { courseId: "CRS-006", semester: "Fall 2025", enrolled: 42, capacity: 45, waitlist: 12, completionRate: 0.88, avgGrade: 3.4, dropRate: 0.07 },
-      { courseId: "CRS-009", semester: "Fall 2025", enrolled: 58, capacity: 65, waitlist: 0, completionRate: 0.79, avgGrade: 2.7, dropRate: 0.14 },
-      { courseId: "CRS-011", semester: "Fall 2025", enrolled: 32, capacity: 35, waitlist: 6, completionRate: 0.90, avgGrade: 3.5, dropRate: 0.05 },
-      { courseId: "CRS-013", semester: "Fall 2025", enrolled: 22, capacity: 25, waitlist: 4, completionRate: 0.86, avgGrade: 3.3, dropRate: 0.09 },
-      { courseId: "CRS-016", semester: "Fall 2025", enrolled: 28, capacity: 30, waitlist: 7, completionRate: 0.92, avgGrade: 3.6, dropRate: 0.04 },
-      { courseId: "CRS-022", semester: "Fall 2025", enrolled: 45, capacity: 60, waitlist: 0, completionRate: 0.83, avgGrade: 3.0, dropRate: 0.11 },
-      // Spring 2026
-      { courseId: "CRS-002", semester: "Spring 2026", enrolled: 78, capacity: 80, waitlist: 5, completionRate: 0.87, avgGrade: 3.0, dropRate: 0.08 },
-      { courseId: "CRS-004", semester: "Spring 2026", enrolled: 65, capacity: 70, waitlist: 2, completionRate: 0.89, avgGrade: 3.1, dropRate: 0.07 },
-      { courseId: "CRS-007", semester: "Spring 2026", enrolled: 38, capacity: 50, waitlist: 0, completionRate: 0.84, avgGrade: 2.9, dropRate: 0.11 },
-      { courseId: "CRS-008", semester: "Spring 2026", enrolled: 28, capacity: 30, waitlist: 3, completionRate: 0.93, avgGrade: 3.5, dropRate: 0.03 },
-      { courseId: "CRS-012", semester: "Spring 2026", enrolled: 27, capacity: 30, waitlist: 2, completionRate: 0.90, avgGrade: 3.4, dropRate: 0.06 },
-      { courseId: "CRS-014", semester: "Spring 2026", enrolled: 25, capacity: 30, waitlist: 0, completionRate: 0.92, avgGrade: 3.6, dropRate: 0.04 },
-      { courseId: "CRS-015", semester: "Spring 2026", enrolled: 18, capacity: 20, waitlist: 4, completionRate: 0.95, avgGrade: 3.7, dropRate: 0.02 },
-      { courseId: "CRS-017", semester: "Spring 2026", enrolled: 30, capacity: 35, waitlist: 0, completionRate: 0.94, avgGrade: 3.5, dropRate: 0.03 },
-      { courseId: "CRS-019", semester: "Spring 2026", enrolled: 48, capacity: 55, waitlist: 0, completionRate: 0.88, avgGrade: 3.1, dropRate: 0.08 },
-      { courseId: "CRS-023", semester: "Spring 2026", enrolled: 32, capacity: 40, waitlist: 0, completionRate: 0.81, avgGrade: 2.8, dropRate: 0.13 },
-      // Fall 2026
-      { courseId: "CRS-001", semester: "Fall 2026", enrolled: 118, capacity: 120, waitlist: 15, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-003", semester: "Fall 2026", enrolled: 58, capacity: 60, waitlist: 7, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-005", semester: "Fall 2026", enrolled: 52, capacity: 60, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-006", semester: "Fall 2026", enrolled: 44, capacity: 45, waitlist: 18, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-009", semester: "Fall 2026", enrolled: 60, capacity: 65, waitlist: 2, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-010", semester: "Fall 2026", enrolled: 22, capacity: 40, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-011", semester: "Fall 2026", enrolled: 34, capacity: 35, waitlist: 8, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-013", semester: "Fall 2026", enrolled: 24, capacity: 25, waitlist: 6, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-016", semester: "Fall 2026", enrolled: 29, capacity: 30, waitlist: 11, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-020", semester: "Fall 2026", enrolled: 38, capacity: 40, waitlist: 3, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-021", semester: "Fall 2026", enrolled: 15, capacity: 35, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-022", semester: "Fall 2026", enrolled: 50, capacity: 60, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-024", semester: "Fall 2026", enrolled: 28, capacity: 35, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      // Extra records for trends
-      { courseId: "CRS-004", semester: "Fall 2025", enrolled: 60, capacity: 70, waitlist: 0, completionRate: 0.86, avgGrade: 3.0, dropRate: 0.09 },
-      { courseId: "CRS-005", semester: "Fall 2025", enrolled: 50, capacity: 60, waitlist: 0, completionRate: 0.85, avgGrade: 3.0, dropRate: 0.10 },
-      { courseId: "CRS-008", semester: "Fall 2025", enrolled: 25, capacity: 30, waitlist: 1, completionRate: 0.88, avgGrade: 3.3, dropRate: 0.08 },
-      { courseId: "CRS-019", semester: "Fall 2025", enrolled: 50, capacity: 55, waitlist: 0, completionRate: 0.84, avgGrade: 3.0, dropRate: 0.10 },
-      { courseId: "CRS-020", semester: "Spring 2026", enrolled: 35, capacity: 40, waitlist: 0, completionRate: 0.87, avgGrade: 3.2, dropRate: 0.08 },
-      { courseId: "CRS-024", semester: "Spring 2026", enrolled: 30, capacity: 35, waitlist: 0, completionRate: 0.85, avgGrade: 3.0, dropRate: 0.10 },
-      { courseId: "CRS-010", semester: "Fall 2025", enrolled: 35, capacity: 40, waitlist: 2, completionRate: 0.80, avgGrade: 3.1, dropRate: 0.12 },
-      { courseId: "CRS-017", semester: "Fall 2025", enrolled: 28, capacity: 35, waitlist: 0, completionRate: 0.91, avgGrade: 3.4, dropRate: 0.05 },
-      { courseId: "CRS-012", semester: "Fall 2025", enrolled: 25, capacity: 30, waitlist: 0, completionRate: 0.85, avgGrade: 3.2, dropRate: 0.10 },
-      { courseId: "CRS-014", semester: "Fall 2025", enrolled: 22, capacity: 30, waitlist: 0, completionRate: 0.89, avgGrade: 3.4, dropRate: 0.06 },
-      { courseId: "CRS-015", semester: "Fall 2025", enrolled: 16, capacity: 20, waitlist: 2, completionRate: 0.88, avgGrade: 3.5, dropRate: 0.06 },
-      { courseId: "CRS-021", semester: "Spring 2026", enrolled: 30, capacity: 35, waitlist: 0, completionRate: 0.83, avgGrade: 3.0, dropRate: 0.10 },
-      { courseId: "CRS-007", semester: "Fall 2025", enrolled: 40, capacity: 50, waitlist: 0, completionRate: 0.80, avgGrade: 2.8, dropRate: 0.14 },
-      { courseId: "CRS-025", semester: "Spring 2026", enrolled: 12, capacity: 35, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-018", semester: "Fall 2026", enrolled: 10, capacity: 25, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-023", semester: "Fall 2026", enrolled: 35, capacity: 40, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
-      { courseId: "CRS-025", semester: "Fall 2026", enrolled: 20, capacity: 35, waitlist: 0, completionRate: 0.0, avgGrade: 0.0, dropRate: 0.0 },
+    // === INVENTORY (representative items per store) ===
+    const baseInventory = [
+      { sku: "SKU-4411", productName: "Horizon Organic Whole Milk 64oz", category: "dairy", reorderPoint: 30, supplier: "DairyFresh Co" },
+      { sku: "SKU-4412", productName: "Organic Valley 2% Milk 64oz", category: "dairy", reorderPoint: 25, supplier: "DairyFresh Co" },
+      { sku: "SKU-7823", productName: "Claritin 24hr 30ct", category: "otc_health", reorderPoint: 10, supplier: "Johnson Distribution" },
+      { sku: "SKU-1001", productName: "Bananas (bunch)", category: "produce", reorderPoint: 50, supplier: "FreshHarvest LLC" },
+      { sku: "SKU-2005", productName: "Sourdough Bread Loaf", category: "bakery", reorderPoint: 20, supplier: "Local Bakery Co" },
     ];
-    if (!hasEnrollment) {
-      for (const record of enrollmentRecords) await ctx.db.insert("enrollment", record);
+
+    const storeStockLevels: Record<string, Record<string, { stock: number; lastDelivery: string }>> = {
+      "STR-101": { "SKU-4411": { stock: 0, lastDelivery: "2026-04-08" }, "SKU-4412": { stock: 5, lastDelivery: "2026-04-08" }, "SKU-7823": { stock: 15, lastDelivery: "2026-04-09" }, "SKU-1001": { stock: 65, lastDelivery: "2026-04-12" }, "SKU-2005": { stock: 18, lastDelivery: "2026-04-12" } },
+      "STR-102": { "SKU-4411": { stock: 8, lastDelivery: "2026-04-08" }, "SKU-4412": { stock: 3, lastDelivery: "2026-04-08" }, "SKU-7823": { stock: 0, lastDelivery: "2026-04-03" }, "SKU-1001": { stock: 42, lastDelivery: "2026-04-11" }, "SKU-2005": { stock: 22, lastDelivery: "2026-04-12" } },
+      "STR-103": { "SKU-4411": { stock: 35, lastDelivery: "2026-04-11" }, "SKU-4412": { stock: 28, lastDelivery: "2026-04-11" }, "SKU-7823": { stock: 12, lastDelivery: "2026-04-09" }, "SKU-1001": { stock: 55, lastDelivery: "2026-04-12" }, "SKU-2005": { stock: 8, lastDelivery: "2026-04-11" } },
+      "STR-104": { "SKU-4411": { stock: 22, lastDelivery: "2026-04-10" }, "SKU-4412": { stock: 18, lastDelivery: "2026-04-10" }, "SKU-7823": { stock: 9, lastDelivery: "2026-04-09" }, "SKU-1001": { stock: 30, lastDelivery: "2026-04-11" }, "SKU-2005": { stock: 25, lastDelivery: "2026-04-12" } },
+      "STR-105": { "SKU-4411": { stock: 40, lastDelivery: "2026-04-11" }, "SKU-4412": { stock: 32, lastDelivery: "2026-04-11" }, "SKU-7823": { stock: 14, lastDelivery: "2026-04-10" }, "SKU-1001": { stock: 48, lastDelivery: "2026-04-12" }, "SKU-2005": { stock: 15, lastDelivery: "2026-04-11" } },
+      "STR-106": { "SKU-4411": { stock: 28, lastDelivery: "2026-04-10" }, "SKU-4412": { stock: 20, lastDelivery: "2026-04-10" }, "SKU-7823": { stock: 11, lastDelivery: "2026-04-09" }, "SKU-1001": { stock: 70, lastDelivery: "2026-04-12" }, "SKU-2005": { stock: 19, lastDelivery: "2026-04-12" } },
+      "STR-107": { "SKU-4411": { stock: 15, lastDelivery: "2026-04-09" }, "SKU-4412": { stock: 12, lastDelivery: "2026-04-09" }, "SKU-7823": { stock: 6, lastDelivery: "2026-04-08" }, "SKU-1001": { stock: 38, lastDelivery: "2026-04-11" }, "SKU-2005": { stock: 21, lastDelivery: "2026-04-12" } },
+      "STR-108": { "SKU-4411": { stock: 30, lastDelivery: "2026-04-10" }, "SKU-4412": { stock: 25, lastDelivery: "2026-04-10" }, "SKU-7823": { stock: 13, lastDelivery: "2026-04-10" }, "SKU-1001": { stock: 10, lastDelivery: "2026-04-12" }, "SKU-2005": { stock: 5, lastDelivery: "2026-04-11" } },
+    };
+
+    if (!hasInventory) {
+      for (const [storeId, skus] of Object.entries(storeStockLevels)) {
+        for (const base of baseInventory) {
+          const override = skus[base.sku];
+          await ctx.db.insert("inventory", {
+            storeId,
+            sku: base.sku,
+            productName: base.productName,
+            category: base.category,
+            currentStock: override?.stock ?? 20,
+            reorderPoint: base.reorderPoint,
+            lastDelivery: override?.lastDelivery ?? "2026-04-10",
+            supplier: base.supplier,
+          });
+        }
+      }
     }
 
-    // === FACULTY ===
-    const facultyMembers = [
-      { facultyId: "FAC-001", programId: "PRG-CS-BS", name: "Dr. Sarah Mitchell", expertise: ["algorithms", "theory of computation", "Python"], courseLoad: 3, maxLoad: 3, rank: "Associate Professor", status: "active" },
-      { facultyId: "FAC-002", programId: "PRG-DS-MS", name: "Dr. David Chen", expertise: ["machine learning", "NLP", "deep learning", "statistics"], courseLoad: 4, maxLoad: 3, rank: "Professor", status: "active" },
-      { facultyId: "FAC-003", programId: "PRG-CS-BS", name: "Dr. Robert Kim", expertise: ["operating systems", "networks", "cybersecurity"], courseLoad: 3, maxLoad: 3, rank: "Professor", status: "active" },
-      { facultyId: "FAC-004", programId: "PRG-CS-BS", name: "Dr. Emily Wang", expertise: ["databases", "distributed systems", "data engineering"], courseLoad: 2, maxLoad: 3, rank: "Assistant Professor", status: "active" },
-      { facultyId: "FAC-005", programId: "PRG-SE-BS", name: "Dr. James Park", expertise: ["software engineering", "DevOps", "agile methods"], courseLoad: 3, maxLoad: 3, rank: "Associate Professor", status: "active" },
-      { facultyId: "FAC-006", programId: "PRG-CS-BS", name: "Dr. Angela Torres", expertise: ["computer architecture", "embedded systems", "hardware design"], courseLoad: 2, maxLoad: 3, rank: "Assistant Professor", status: "active" },
-      { facultyId: "FAC-007", programId: "PRG-DS-MS", name: "Dr. Maria Santos", expertise: ["data visualization", "HCI", "UX research"], courseLoad: 1, maxLoad: 2, rank: "Adjunct", status: "active" },
-      { facultyId: "FAC-008", programId: "PRG-CS-SAT", name: "Dr. Michael Torres", expertise: ["algorithms", "programming languages", "compilers"], courseLoad: 2, maxLoad: 2, rank: "Associate Professor", status: "active" },
+    // === STAFFING ===
+    const staffing = [
+      { storeId: "STR-101", date: "2026-04-14", scheduledCount: 9, actualCount: 8, noShowCount: 1, overtimeHours: 2, staffingRisk: "medium", notes: "Front end covered with one overtime cashier." },
+      { storeId: "STR-102", date: "2026-04-14", scheduledCount: 8, actualCount: 8, noShowCount: 0, overtimeHours: 1, staffingRisk: "low", notes: "Stable coverage despite allergy aisle vendor issue." },
+      { storeId: "STR-103", date: "2026-04-14", scheduledCount: 7, actualCount: 4, noShowCount: 3, overtimeHours: 8, staffingRisk: "high", notes: "Bakery and deli coverage below target. Temp support requested." },
+      { storeId: "STR-104", date: "2026-04-14", scheduledCount: 10, actualCount: 9, noShowCount: 1, overtimeHours: 3, staffingRisk: "medium", notes: "Cooler incident pulling labor into emergency response." },
+      { storeId: "STR-105", date: "2026-04-14", scheduledCount: 7, actualCount: 7, noShowCount: 0, overtimeHours: 0, staffingRisk: "low", notes: "Normal staffing." },
+      { storeId: "STR-106", date: "2026-04-14", scheduledCount: 11, actualCount: 10, noShowCount: 1, overtimeHours: 2, staffingRisk: "medium", notes: "Service desk tied up on legal documentation." },
+      { storeId: "STR-107", date: "2026-04-14", scheduledCount: 8, actualCount: 8, noShowCount: 0, overtimeHours: 1, staffingRisk: "low", notes: "Loss prevention walk added to afternoon schedule." },
+      { storeId: "STR-108", date: "2026-04-14", scheduledCount: 8, actualCount: 7, noShowCount: 1, overtimeHours: 2, staffingRisk: "medium", notes: "Receiving team handling delayed produce inspection." },
     ];
-    if (!hasFaculty) {
-      for (const member of facultyMembers) await ctx.db.insert("faculty", member);
+    if (!hasStaffing) {
+      for (const row of staffing) await ctx.db.insert("staffing", row);
     }
 
-    // === CURRICULAR POLICIES ===
-    const policiesData = [
-      { policyId: "POL-ABET-001", category: "accreditation", title: "ABET Computing Criteria — Student Outcomes", content: "All BS programs must demonstrate student attainment of (1) analyze a complex computing problem, (2) design, implement, and evaluate a computing-based solution, (3) communicate effectively, (4) recognize professional responsibilities, (5) function on teams, (6) apply CS theory and principles. Annual assessment required with direct and indirect measures.", accreditationBody: "ABET", effectiveDate: "2024-01-01" },
-      { policyId: "POL-ABET-002", category: "accreditation", title: "ABET Continuous Improvement", content: "Programs must regularly evaluate and improve using documented assessment plans. (1) Collect outcome data each semester, (2) review results annually with advisory board, (3) implement changes within two semesters, (4) document closing-the-loop actions. Failure to demonstrate improvement may result in conditional accreditation.", accreditationBody: "ABET", effectiveDate: "2024-01-01" },
-      { policyId: "POL-CREDIT-001", category: "credit_hours", title: "Credit Hour Policy", content: "One credit hour equals one 50-minute lecture or equivalent per week for 15 weeks. Lab courses: 2-3 hours of lab per credit hour. Online courses must document equivalent engagement time. Maximum credit load per semester: 18 for undergrad, 12 for grad without advisor approval.", accreditationBody: "University", effectiveDate: "2023-08-01" },
-      { policyId: "POL-PREREQ-001", category: "prerequisites", title: "Prerequisite Enforcement Policy", content: "Prerequisites must be completed with grade C or better. Students may petition for prerequisite override through department chair with advisor recommendation. Override granted only when (1) student demonstrates equivalent knowledge, (2) no more than one prerequisite is waived, (3) instructor approves. Chain prerequisites (A->B->C) cannot skip intermediate courses.", accreditationBody: "University", effectiveDate: "2023-08-01" },
-      { policyId: "POL-REVIEW-001", category: "curriculum_review", title: "Course Review Cycle", content: "Every course must undergo formal review every 3 years. Review includes (1) learning outcome alignment with program objectives, (2) student evaluation analysis, (3) peer teaching observation, (4) industry relevance assessment, (5) textbook and resource currency. Courses not reviewed within cycle are flagged for department chair action.", accreditationBody: "University", effectiveDate: "2024-01-01" },
-      { policyId: "POL-LOAD-001", category: "faculty_load", title: "Faculty Teaching Load Standards", content: "Standard teaching load: 3 courses per semester for tenure-track, 4 for lecturers, 1-2 for adjuncts. Research-active faculty may receive 1-course reduction with dean approval. Overload (exceeding max) requires department chair and dean authorization and carries 15% per-course stipend. No faculty member may exceed max+1 without provost approval.", accreditationBody: "University", effectiveDate: "2024-01-01" },
-      { policyId: "POL-ENROLL-001", category: "enrollment", title: "Enrollment Management Policy", content: "Minimum viable enrollment: 12 students for electives, 20 for core courses. Courses below minimum for two consecutive offerings are subject to cancellation review. Wait-listed courses with 10+ students must open additional sections if faculty are available. Enrollment cap changes require department chair approval.", accreditationBody: "University", effectiveDate: "2024-01-01" },
-      { policyId: "POL-CERT-001", category: "certificate_programs", title: "Certificate Program Requirements", content: "Certificate programs must include minimum 15 credit hours, at least 2 core courses, and a culminating experience (project or comprehensive exam). Certificates cannot duplicate more than 50% of content from existing degree programs. Annual enrollment review required; programs below 10 students for 2 years face discontinuation.", accreditationBody: "University", effectiveDate: "2024-06-01" },
-      { policyId: "POL-ASSESS-001", category: "assessment", title: "Student Learning Outcome Assessment", content: "Each course must have 3-5 measurable learning outcomes mapped to program outcomes. Assessment methods: (1) embedded exam questions, (2) rubric-scored assignments, (3) capstone project evaluation. Results reported to assessment coordinator by end of each semester. Courses with <70% student attainment on any outcome require intervention plan.", accreditationBody: "ABET", effectiveDate: "2024-01-01" },
-      { policyId: "POL-ONLINE-001", category: "online_delivery", title: "Online Course Standards", content: "Online sections must maintain the same learning outcomes, assessments, and rigor as in-person sections. Additional requirements: (1) proctored exams or equivalent verification, (2) weekly synchronous or structured asynchronous engagement, (3) ADA-compliant materials, (4) regular substantive interaction per DOE guidelines.", accreditationBody: "University", effectiveDate: "2024-01-01" },
-      { policyId: "POL-GAP-001", category: "curriculum_gap", title: "Curriculum Gap Analysis Protocol", content: "Annual curriculum mapping against industry competency frameworks (ACM/IEEE CS2023). Gaps identified when >20% of competency areas lack course coverage. Resolution: (1) propose new course within one semester, (2) modify existing courses within two semesters, (3) report coverage changes to ABET coordinator. Current identified gaps: cloud-native development, AI ethics integration, DevSecOps.", accreditationBody: "ABET", effectiveDate: "2025-01-01" },
-      { policyId: "POL-TRANSFER-001", category: "transfer_credit", title: "Transfer Credit Evaluation", content: "Transfer credits accepted from regionally accredited institutions. Evaluation criteria: (1) syllabus comparison showing >75% content overlap, (2) minimum grade of C, (3) course taken within last 7 years for technology courses. Maximum 60 transfer credits for BS, 9 for MS. Department chair reviews edge cases.", accreditationBody: "University", effectiveDate: "2023-08-01" },
+    // === POLICIES ===
+    const policies = [
+      { policyId: "POL-INV-003", title: "Vendor Non-Compliance Escalation", category: "inventory", effectiveDate: "2025-01-15",
+        content: "When a vendor misses 2+ scheduled deliveries within 7 days: (1) Document each missed delivery with date/time. (2) Contact vendor account rep within 24 hours. (3) If no resolution in 48 hours, escalate to Regional Manager. (4) Regional Manager may authorize emergency substitute supplier. (5) Issue formal written warning via vendor portal. (6) After 3 warnings in 90 days, initiate vendor performance review per POL-VENDOR-001." },
+      { policyId: "POL-HR-007", title: "Emergency Staffing Protocol", category: "hr", effectiveDate: "2025-03-01",
+        content: "When 30%+ of scheduled shift calls out: (1) Store Manager authorized to approve up to 8 hours overtime per remaining associate. (2) Contact neighboring stores for voluntary coverage. (3) If still short, contact regional temp staffing agency (StaffNow: 800-555-0147). (4) Minimum floor coverage: 1 associate per department. (5) If bakery/deli cannot be staffed, close those service counters and post signage. (6) File incident report within 24 hours." },
+      { policyId: "POL-MAINT-001", title: "Emergency Equipment Failure", category: "maintenance", effectiveDate: "2025-02-01",
+        content: "For equipment failures affecting food safety (coolers, freezers, ovens): (1) Check temperature logs immediately. (2) If temperature exceeds safe range (41°F+ for cold, below 135°F for hot), begin product evaluation. (3) Products above safe temp for 2+ hours must be discarded — document and photograph. (4) Authorized to call any licensed HVAC vendor if primary vendor unavailable within 4 hours. Emergency spend limit: $5,000 without regional approval, $15,000 with regional approval. (5) File insurance claim for product loss exceeding $2,000." },
+      { policyId: "POL-COMP-002", title: "Health Inspection Readiness", category: "compliance", effectiveDate: "2025-01-01",
+        content: "Pre-inspection checklist (complete 72 hours before scheduled visit): (1) Verify all employee food handler certifications current. (2) Check handwashing logs — no gaps exceeding 4 hours. (3) Calibrate all food thermometers — document results. (4) Verify pest control service reports filed monthly. (5) Walk all storage areas for proper FIFO labeling. (6) Check all cleaning schedules signed off. (7) Verify chemical storage separated from food. (8) Regional support available — request merchandising team for deep clean assistance." },
+      { policyId: "POL-MERCH-004", title: "Seasonal Transition Windows", category: "merchandising", effectiveDate: "2025-01-15",
+        content: "Seasonal endcap transitions must complete within 5 business days of scheduled date. Extensions up to 3 days may be approved by Store Manager without regional involvement. Beyond 3 days requires Regional Manager approval. All clearance items must be marked down minimum 50% during transition. New planogram sets must be photographed and uploaded to compliance portal within 24 hours of completion." },
+      { policyId: "POL-SAFETY-001", title: "Incident Response Protocol", category: "safety", effectiveDate: "2025-01-01",
+        content: "For customer injury incidents: (1) Provide immediate first aid if trained. (2) Call 911 if injury appears serious. (3) Complete incident report form IR-200 within 1 hour. (4) Preserve security camera footage — minimum 30-day hold. (5) Do NOT admit fault or liability. (6) Notify corporate legal within 4 hours at legal@corp.com. (7) If customer mentions attorney, escalate immediately to Regional Manager AND corporate legal. (8) Photograph scene before cleanup." },
+      { policyId: "POL-INV-005", title: "Vendor-Managed Inventory Gaps", category: "inventory", effectiveDate: "2025-02-15",
+        content: "For vendor-managed displays (DSD items): (1) Check vendor restock schedule in vendor portal. (2) If vendor misses scheduled visit, wait 48 hours then contact vendor rep. (3) Store team may NOT restock vendor-managed displays. (4) If display empty 3+ days during peak season, escalate to vendor account manager. (5) Document lost sales estimate based on avg daily units." },
+      { policyId: "POL-HR-012", title: "New Hire Certification Timeline", category: "hr", effectiveDate: "2025-03-15",
+        content: "All new hires must complete: (1) POS/register certification within 5 business days of start. (2) Food safety certification within 10 business days. (3) Department-specific training within 15 business days. If training systems are unavailable, contact IT help desk (#IT-HELP) and document the outage. Manager may extend deadlines by up to 3 days for system issues. New hires may not work independently until POS-certified." },
+      { policyId: "POL-LP-003", title: "Organized Retail Crime Response", category: "loss_prevention", effectiveDate: "2025-04-01",
+        content: "For suspected organized retail theft (ORC): (1) Do NOT confront suspects. (2) Activate camera recording on affected areas. (3) File police report within 24 hours — note report number. (4) Submit LP incident report to regional LP manager. (5) After 2+ incidents in 30 days, request anti-theft fixture assessment. Budget for fixtures: up to $3,000 per department with LP manager approval. (6) Share suspect descriptions with neighboring stores via LP network." },
+      { policyId: "POL-IT-002", title: "POS System Escalation", category: "it", effectiveDate: "2025-01-15",
+        content: "POS/SCO system issues: (1) Restart terminal — fixes 60% of issues. (2) If restart fails, submit IT ticket via portal (Priority: High for payment processing, Medium for peripherals). (3) SLA: 4-hour response for High, 24-hour for Medium. (4) If no response within SLA, call IT escalation line: 800-555-0199. (5) For widespread outage (3+ terminals), activate manual backup procedures." },
+      { policyId: "POL-INV-008", title: "Delivery Quality Rejection", category: "inventory", effectiveDate: "2025-02-01",
+        content: "When delivery arrives with quality concerns: (1) Temperature-check perishables immediately using calibrated thermometer. (2) Reject items exceeding safe temperature thresholds. (3) For partial acceptance: document accepted vs rejected items on BOL, photograph rejected items. (4) Driver must sign amended BOL. (5) Submit quality claim to vendor within 24 hours with photos. (6) If truck was 4+ hours late, check all perishable temps regardless of appearance. (7) Store Manager authorized to accept with discount claim up to $5,000." },
+      { policyId: "POL-ECOM-001", title: "BOPIS Fulfillment Failures", category: "ecommerce", effectiveDate: "2025-03-01",
+        content: "When online orders cannot be fulfilled: (1) Contact customer within 2 hours of discovering stock-out. (2) Offer substitution or refund. (3) If customer declines substitution, process full refund + issue $5 digital coupon. (4) Update inventory system to reflect actual count. (5) If phantom inventory detected (system says in-stock, shelf empty), file inventory variance report. (6) For 3+ phantom inventory incidents in 7 days, request cycle count for affected categories." },
+      { policyId: "POL-SAFETY-005", title: "Emergency Exit Compliance", category: "safety", effectiveDate: "2025-01-01",
+        content: "Emergency exits must be clear at all times. (1) Check all exits during opening and closing walks. (2) No materials within 3 feet of exit doors. (3) Delivery vendors briefed on exit locations — signed acknowledgment required annually. (4) First violation: verbal warning to responsible party. (5) Second violation within 90 days: written warning + vendor notification. (6) Third violation: vendor contract review. (7) Photo-document any violations for fire marshal compliance file." },
+      { policyId: "POL-HR-015", title: "ADA Accommodation Process", category: "hr", effectiveDate: "2025-01-15",
+        content: "ADA accommodation requests: (1) Accept all requests in writing — do not evaluate merit at store level. (2) Forward to HR within 48 hours via accommodation@corp.com. (3) HR will initiate interactive process with employee within 5 business days. (4) Interim accommodations (if reasonable) may be provided immediately by Store Manager. (5) Ergonomic equipment requests under $500 may be approved at store level. (6) Modified duty assignments require HR approval." },
+      { policyId: "POL-PRICING-001", title: "Competitive Response Protocol", category: "pricing", effectiveDate: "2025-04-01",
+        content: "When significant competitor opens nearby: (1) Conduct price comparison on top 50 KVI (Known Value Items) within 7 days. (2) Submit comparison to Regional Manager with revenue impact estimate. (3) Regional Manager may authorize targeted price matches on up to 20 items. (4) Monitor foot traffic weekly for 90 days. (5) If traffic drops exceed 10%, escalate to district pricing committee. (6) Do NOT match below cost — loss-leader pricing requires VP approval." },
+      { policyId: "POL-VENDOR-001", title: "Vendor Performance Review", category: "vendor_management", effectiveDate: "2025-02-01",
+        content: "30-day vendor performance review process: (1) Compile delivery reliability data (on-time %, fill rate, quality rejections). (2) Issue formal performance notification to vendor. (3) Vendor has 15 days to submit corrective action plan. (4) If performance does not improve within 60 days, begin backup vendor qualification. (5) Contract termination requires VP Supply Chain approval. (6) Emergency backup supplier activation: Regional Manager may authorize temporary alternative sourcing." },
+      { policyId: "POL-LP-001", title: "Shrinkage Management", category: "loss_prevention", effectiveDate: "2025-01-01",
+        content: "Shrinkage target: 2.0% of sales. (1) Monthly shrinkage reporting by department. (2) Stores exceeding target by 0.5%+ require action plan within 14 days. (3) LP audit frequency: quarterly for stores at/below target, monthly for stores above. (4) Top shrinkage categories get priority for fixture investment. (5) Regional LP manager reviews all stores exceeding 2.5% quarterly. (6) Inventory accuracy audits (cycle counts) required monthly for high-shrink departments." },
+      { policyId: "POL-HR-020", title: "Seasonal Hiring Playbook", category: "hr", effectiveDate: "2025-03-01",
+        content: "Summer seasonal hiring timeline: (1) Submit headcount forecast to Regional Manager by April 15. (2) Job postings live by April 20. (3) Coordinate regional job fairs — minimum 2 events by May 1. (4) Target: all seasonal hires onboarded by May 15. (5) Training batch schedule: POS certification week 1, department training weeks 2-3. (6) Seasonal associates eligible for permanent conversion after 90 days with manager recommendation." },
+      { policyId: "POL-MAINT-006", title: "Equipment Replacement Thresholds", category: "maintenance", effectiveDate: "2025-02-15",
+        content: "Equipment replacement approval levels: (1) Under $500: Store Manager approved. (2) $500-$2,000: Store Manager + Regional Manager. (3) Over $2,000: VP Operations approval. (4) For batch replacements (e.g., shopping carts), vendor minimum order requirements may be combined across stores to meet thresholds. (5) Submit capital request form CR-100 for items over $1,000. (6) Interim solutions (repairs, rentals) authorized at store level up to $300." },
     ];
     if (!hasPolicies) {
-      for (const policy of policiesData) await ctx.db.insert("curricularPolicies", policy);
+      for (const p of policies) await ctx.db.insert("policies", p);
     }
 
-    // === REVIEWS ===
-    const reviewsData = [
-      { reviewId: "REV-001", courseId: "CRS-001", type: "student_eval", findings: "Students report the course is well-structured with clear progression from concepts to code. Some students request more hands-on lab time. TA office hours are frequently overcrowded.", recommendations: "Add a weekly lab section and increase TA allocation from 2 to 3.", semester: "Fall 2025", score: 4.2 },
-      { reviewId: "REV-002", courseId: "CRS-002", type: "student_eval", findings: "High difficulty level. Students appreciate rigorous content but report the jump from CS101 is steep. Drop rate of 10% is above department average.", recommendations: "Add bridge content in first two weeks. Consider a CS150 intermediate course.", semester: "Fall 2025", score: 3.6 },
-      { reviewId: "REV-003", courseId: "CRS-006", type: "peer_review", findings: "Strong course design with excellent integration of theory and practice. Assignments use current ML frameworks (PyTorch). Could benefit from more emphasis on ethical AI considerations.", recommendations: "Integrate AI ethics module in weeks 10-12. Add fairness metric assignment.", semester: "Fall 2025", score: 4.5 },
-      { reviewId: "REV-004", courseId: "CRS-003", type: "student_eval", findings: "Course content is solid but pacing is uneven. Process scheduling section is rushed while memory management has too much time allocated. Students want more hands-on kernel programming.", recommendations: "Rebalance weeks 4-8 pacing. Add xv6 kernel lab exercises.", semester: "Fall 2025", score: 3.4 },
-      { reviewId: "REV-005", courseId: "CRS-011", type: "peer_review", findings: "Graduate-level rigor is well maintained. Real-world datasets used effectively. Students produce publishable-quality analyses. Prerequisites may need strengthening in linear algebra.", recommendations: "Add linear algebra review module. Consider MATH501 as co-requisite.", semester: "Fall 2025", score: 4.6 },
-      { reviewId: "REV-006", courseId: "CRS-009", type: "student_eval", findings: "Students find the material dry and disconnected from practical applications. Lab equipment is outdated. Completion rate of 79% is lowest in the CS program.", recommendations: "Modernize labs with FPGA boards. Add real-world architecture case studies.", semester: "Fall 2025", score: 2.9 },
-      { reviewId: "REV-007", courseId: "CRS-010", type: "accreditation_audit", findings: "Cybersecurity course covers NIST framework adequately but lacks hands-on penetration testing component required by industry standards. Course under review for prerequisite chain concerns.", recommendations: "Add CTF (capture the flag) lab component. Resolve prerequisite dependency on CS410 to avoid bottleneck.", semester: "Spring 2026", score: 3.2 },
-      { reviewId: "REV-008", courseId: "CRS-021", type: "accreditation_audit", findings: "Software Architecture course has not been updated in 2 years. Microservices content is outdated and does not cover serverless or edge computing patterns. Enrollment has declined 25% since last offering.", recommendations: "Major revision needed: add serverless, event-driven architecture, and observability modules. Align with ACM SE2023 curriculum guidelines.", semester: "Spring 2026", score: 2.8 },
-      { reviewId: "REV-009", courseId: "CRS-022", type: "student_eval", findings: "Satellite campus students appreciate having local access but report feeling disconnected from main campus resources. Online office hours with main campus TAs help.", recommendations: "Establish dedicated satellite campus study group. Improve video conferencing setup for cross-campus collaboration.", semester: "Fall 2025", score: 3.8 },
-      { reviewId: "REV-010", courseId: "CRS-016", type: "student_eval", findings: "Highly rated course with excellent balance of theory and implementation. Students report GPU access is sometimes limited due to shared lab resources.", recommendations: "Secure additional cloud GPU credits. Consider partnership with NVIDIA Academic Program.", semester: "Fall 2025", score: 4.7 },
-      { reviewId: "REV-011", courseId: "CRS-008", type: "peer_review", findings: "Capstone projects demonstrate strong integration of prior coursework. Industry mentors report students are well-prepared. Some projects lack sufficient testing coverage.", recommendations: "Require minimum 80% code coverage in deliverables. Add automated CI/CD pipeline requirement.", semester: "Spring 2026", score: 4.3 },
-      { reviewId: "REV-012", courseId: "CRS-001", type: "curriculum_gap", findings: "CS101 does not cover version control (Git) or command-line tools. These are expected competencies by CS201 and are listed in ACM CC2023 introductory curriculum. Students arrive at CS201 without these skills.", recommendations: "Add Git/CLI module in weeks 3-4 of CS101. Reduce time on flowcharting (weeks 2-3) to accommodate.", semester: "Spring 2026", score: 0.0 },
-      { reviewId: "REV-013", courseId: "CRS-025", type: "curriculum_gap", findings: "Cloud-native development is identified as a curriculum gap per POL-GAP-001. No existing course covers serverless, edge computing, or modern deployment patterns. The proposed CS430 would address this gap.", recommendations: "Approve CS430 proposal. Ensure alignment with cloud certification pathways (AWS, GCP). Target Fall 2026 launch.", semester: "Spring 2026", score: 0.0 },
-      { reviewId: "REV-014", courseId: "CRS-017", type: "student_eval", findings: "AI Ethics course is popular and well-received. Case study approach is effective. Students want more technical fairness metrics and less philosophical discussion.", recommendations: "Increase technical content to 60% (from 40%). Add Fairlearn/AIF360 toolkit labs.", semester: "Spring 2026", score: 4.1 },
-      { reviewId: "REV-015", courseId: "CRS-015", type: "peer_review", findings: "Data Science capstone produces high-quality work. Industry partners report strong student preparation. Cohort size is limited by faculty supervision capacity.", recommendations: "Recruit adjunct industry mentors to increase capacity. Consider co-advising model with DS faculty.", semester: "Spring 2026", score: 4.4 },
+    // === HISTORICAL RESOLUTIONS ===
+    const resolutions = [
+      {
+        resolutionId: "RES-001",
+        issueId: "ISS-001",
+        storeId: "STR-101",
+        issueType: "inventory_gap",
+        title: "Vendor non-compliance resolved through substitute supplier",
+        content: "Repeated dairy vendor misses were mitigated by documenting missed deliveries, escalating to regional, and temporarily sourcing from an approved backup vendor while formal vendor review began.",
+        actionsTaken: [
+          "Logged two missed deliveries with timestamps",
+          "Called vendor account representative within 24 hours",
+          "Escalated to regional manager for substitute supplier approval",
+          "Activated temporary backup supplier for high-demand SKUs",
+        ],
+        outcome: "Recovered in-stock position within 48 hours and triggered vendor performance review.",
+        policyIds: ["POL-INV-003", "POL-VENDOR-001"],
+        createdAt: "2026-03-08T14:00:00Z",
+      },
+      {
+        resolutionId: "RES-002",
+        issueId: "ISS-003",
+        storeId: "STR-103",
+        issueType: "staffing",
+        title: "Emergency staffing coverage for multi-callout weekend shift",
+        content: "A store with three same-day callouts stabilized weekend operations by approving overtime, borrowing coverage from a nearby store, and temporarily closing one service counter until staffing normalized.",
+        actionsTaken: [
+          "Approved 8 hours overtime for remaining associates",
+          "Borrowed one cashier and one deli associate from neighboring store",
+          "Closed bakery service counter and posted signage",
+          "Filed staffing incident report within 24 hours",
+        ],
+        outcome: "Store maintained minimum department coverage and reopened full service next day.",
+        policyIds: ["POL-HR-007"],
+        createdAt: "2026-02-17T18:30:00Z",
+      },
+      {
+        resolutionId: "RES-003",
+        issueId: "ISS-004",
+        storeId: "STR-104",
+        issueType: "equipment_failure",
+        title: "Perishable loss contained during cooler outage",
+        content: "A walk-in cooler event was contained by moving salvageable product, documenting unsafe temperature exposure, and authorizing an emergency HVAC vendor after the primary vendor missed the response window.",
+        actionsTaken: [
+          "Checked temperature logs immediately",
+          "Discarded exposed product above safe thresholds",
+          "Photographed loss for insurance claim",
+          "Authorized alternate HVAC vendor under emergency spend policy",
+        ],
+        outcome: "Food safety risk closed within six hours and claim submitted for product loss.",
+        policyIds: ["POL-MAINT-001"],
+        createdAt: "2026-01-22T09:10:00Z",
+      },
+      {
+        resolutionId: "RES-004",
+        issueType: "customer_escalation",
+        title: "Slip-and-fall escalation routed to legal with preserved evidence",
+        content: "A customer injury case was handled by preserving footage, avoiding liability admission, notifying legal within four hours, and documenting the scene before cleanup.",
+        actionsTaken: [
+          "Completed incident report IR-200 within one hour",
+          "Placed 30-day hold on security footage",
+          "Escalated to legal and regional immediately",
+          "Photographed scene before cleanup",
+        ],
+        outcome: "Case packet was complete for legal review with no evidence gap.",
+        policyIds: ["POL-SAFETY-001"],
+        createdAt: "2026-02-03T12:20:00Z",
+      },
     ];
-    if (!hasReviews) {
-      for (const review of reviewsData) await ctx.db.insert("reviews", review);
+    if (!hasResolutions) {
+      for (const resolution of resolutions) await ctx.db.insert("resolutions", resolution);
     }
 
     // === ACTION ITEMS ===
-    const actionItemsData = [
+    const actionItems = [
       {
         actionItemId: "ACT-001",
-        courseId: "CRS-010",
-        programId: "PRG-CS-BS",
-        campusId: "Main Campus",
-        title: "Resolve CS420 prerequisite bottleneck",
-        description: "CS420 Cybersecurity requires CS410 (Networks) which is only offered in Spring. Students who miss it are delayed by a full year. Evaluate whether CS301 alone is sufficient as prerequisite.",
-        assignee: "Dr. Robert Kim",
+        issueId: "ISS-001",
+        storeId: "STR-101",
+        regionId: "REG-NE",
+        title: "Escalate DairyFresh delivery misses to regional",
+        description: "Document missed deliveries and request substitute supplier approval.",
+        assignee: "Maria Chen",
         priority: "high",
         status: "open",
-        source: "accreditation_review",
-        dueAt: "2026-05-15T00:00:00Z",
-        createdAt: "2026-03-01T00:00:00Z",
-        completedAt: undefined,
+        source: "seed",
+        dueAt: "2026-04-14T18:00:00Z",
+        createdAt: "2026-04-14T09:00:00Z",
       },
       {
         actionItemId: "ACT-002",
-        courseId: "CRS-021",
-        programId: "PRG-SE-BS",
-        campusId: "Main Campus",
-        title: "Revise SE400 Software Architecture curriculum",
-        description: "Course content is 2 years stale. Must update to cover serverless, event-driven architecture, and observability patterns per accreditation audit findings (REV-008).",
-        assignee: "Dr. Angela Torres",
+        issueId: "ISS-003",
+        storeId: "STR-103",
+        regionId: "REG-NE",
+        title: "Secure emergency Saturday staffing coverage",
+        description: "Approve overtime, call neighboring stores, and contact StaffNow if gaps remain.",
+        assignee: "Lisa Nguyen",
         priority: "critical",
-        status: "open",
-        source: "accreditation_review",
-        dueAt: "2026-06-01T00:00:00Z",
-        createdAt: "2026-03-15T00:00:00Z",
-        completedAt: undefined,
+        status: "in_progress",
+        source: "seed",
+        dueAt: "2026-04-14T17:00:00Z",
+        createdAt: "2026-04-14T06:50:00Z",
       },
       {
         actionItemId: "ACT-003",
-        courseId: undefined,
-        programId: "PRG-DS-MS",
-        campusId: "Main Campus",
-        title: "Address Dr. Chen teaching overload",
-        description: "Dr. David Chen is teaching 4 courses against a max load of 3. Per POL-LOAD-001, overload requires dean authorization and carries 15% stipend. Either redistribute one course or secure formal overload approval.",
-        assignee: "Dr. Lisa Ramirez",
+        issueId: "ISS-018",
+        regionId: "REG-NE",
+        title: "Run DairyFresh vendor performance review",
+        description: "Compile delivery reliability across stores and issue formal vendor notice.",
+        assignee: "Sandra Williams",
         priority: "high",
         status: "open",
-        source: "agent",
-        dueAt: "2026-04-30T00:00:00Z",
-        createdAt: "2026-04-01T00:00:00Z",
-        completedAt: undefined,
+        source: "seed",
+        dueAt: "2026-04-15T17:00:00Z",
+        createdAt: "2026-04-14T10:00:00Z",
       },
     ];
     if (!hasActionItems) {
-      for (const item of actionItemsData) await ctx.db.insert("actionItems", item);
+      for (const item of actionItems) await ctx.db.insert("actionItems", item);
     }
+
+    return `Seed checked: stores=${hasStores ? "existing" : stores.length}, issues=${hasIssues ? "existing" : issues.length}, inventory=${hasInventory ? "existing" : Object.keys(storeStockLevels).length * baseInventory.length}, staffing=${hasStaffing ? "existing" : staffing.length}, policies=${hasPolicies ? "existing" : policies.length}, resolutions=${hasResolutions ? "existing" : resolutions.length}, actionItems=${hasActionItems ? "existing" : actionItems.length}`;
   },
 });

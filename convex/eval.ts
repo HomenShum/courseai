@@ -10,10 +10,12 @@ const MODEL_NAME = "gemini-3.1-pro-preview";
 interface GoldenCase {
   id: string;
   scenario: string;
-  persona: string;
-  scope?: { programId?: string; campusId?: string };
+  role: string;
+  storeId?: string;
+  regionId?: string;
   query: string;
-  expected_refs: string[];
+  required_references: string[];
+  preferred_response: string;
   criteria: Record<string, boolean>;
 }
 
@@ -43,16 +45,13 @@ function makeRuntimeId(prefix: string) {
 }
 
 function operatorIdForCase(testCase: GoldenCase) {
-  if (testCase.persona === "department_chair") {
-    return "OP-CHAIR";
+  if (testCase.role === "regional_manager") {
+    return "OP-REG-NE";
   }
-  if (testCase.persona === "academic_advisor") {
-    return "OP-ADVISOR";
+  if (testCase.storeId) {
+    return `OP-${testCase.storeId}`;
   }
-  if (testCase.persona === "professor" && testCase.scope?.programId?.includes("DS")) {
-    return "OP-PROF-DS";
-  }
-  return "OP-PROF-CS";
+  return "OP-REG-NE";
 }
 
 function extractResponseText(response: any): string {
@@ -141,8 +140,8 @@ Return ONLY valid JSON with this shape:
 {"accuracy":0,"actionability":0,"policy_compliance":0,"completeness":0,"groundedness":0,"reasoning":"one sentence"}
 
 TEST QUERY: ${testCase.query}
-EXPECTED RESPONSE: ${testCase.query}
-REQUIRED REFERENCES: ${testCase.expected_refs.join(", ")}
+EXPECTED RESPONSE: ${testCase.preferred_response}
+REQUIRED REFERENCES: ${testCase.required_references.join(", ")}
 ACTUAL RESPONSE: ${actualResponse}`;
 
   const response = await ai.models.generateContent({
@@ -218,8 +217,8 @@ export const runEval: any = action({
         const response: unknown = await ctx.runAction(api.agent.chat, {
           operatorId: operatorIdForCase(testCase),
           query: testCase.query,
-          programId: testCase.scope?.programId,
-          campusId: testCase.scope?.campusId,
+          storeId: testCase.storeId,
+          regionId: testCase.regionId,
           sessionId,
         });
 
@@ -235,7 +234,7 @@ export const runEval: any = action({
           typeof response === "object" && response !== null
             ? (response as { messageId?: string; answerPacketId?: string })
             : {};
-        const refCheck = automatedRefCheck(actualResponse, testCase.expected_refs);
+        const refCheck = automatedRefCheck(actualResponse, testCase.required_references);
         const criteriaCheck = automatedCriteriaCheck(actualResponse, testCase.criteria);
         const judgeScores = await judgeResponse(ai, testCase, actualResponse);
 

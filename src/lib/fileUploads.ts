@@ -1,18 +1,18 @@
 type UploadContext = {
   operatorId: string;
-  courseId?: string;
+  issueId?: string;
   sessionId?: string;
-  programId?: string;
-  campusId?: string;
+  storeId?: string;
+  regionId?: string;
   uploadedBy: string;
 };
 
 type CreateFileRecord = (args: {
   operatorId: string;
-  courseId?: string;
+  issueId?: string;
   sessionId?: string;
-  programId?: string;
-  campusId?: string;
+  storeId?: string;
+  regionId?: string;
   filename: string;
   mimeType: string;
   sizeBytes: number;

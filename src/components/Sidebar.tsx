@@ -9,18 +9,20 @@ import { useOperatorSession } from "@/components/OperatorSessionProvider";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/course", label: "Course" },
-  { href: "/department", label: "Department" },
+  { href: "/store", label: "Store" },
+  { href: "/regional", label: "Regional" },
   { href: "/chat", label: "Chat" },
 ];
 
-const programList = [
-  { id: "PRG-CS-BS", name: "CS BS" },
-  { id: "PRG-DS-MS", name: "DS MS" },
-  { id: "PRG-AI-CERT", name: "AI Cert" },
-  { id: "PRG-SE-BS", name: "SE BS" },
-  { id: "PRG-CS-SAT", name: "CS Sat" },
-  { id: "PRG-SE-SAT", name: "SE Sat" },
+const stores = [
+  { id: "STR-101", name: "Greenfield" },
+  { id: "STR-102", name: "Elm St" },
+  { id: "STR-103", name: "Harbor" },
+  { id: "STR-104", name: "Riverside" },
+  { id: "STR-105", name: "College" },
+  { id: "STR-106", name: "Downtown" },
+  { id: "STR-107", name: "Lakeside" },
+  { id: "STR-108", name: "Westfield" },
 ];
 
 export function Sidebar() {
@@ -35,7 +37,7 @@ function SidebarFallback() {
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-[220px] flex-col border-r border-gray-200 bg-white">
       <div className="px-4 py-4">
-        <p className="text-[13px] font-bold text-gray-900">CourseAI</p>
+        <p className="text-[13px] font-bold text-gray-900">FloorAI</p>
       </div>
     </aside>
   );
@@ -44,7 +46,7 @@ function SidebarFallback() {
 function SidebarInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const activeProgramParam = searchParams.get("program");
+  const activeStoreParam = searchParams.get("store");
   const { operator } = useOperatorSession();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -53,15 +55,15 @@ function SidebarInner() {
     operator?.operatorId ? { operatorId: operator.operatorId } : "skip"
   );
 
-  // Filter programs based on operator role
-  const visiblePrograms = (() => {
-    if (!operator || !operatorProfile) return programList;
-    if (operatorProfile.role === "professor") {
-      const allowed = operatorProfile.programIds ?? [];
-      return programList.filter((p) => allowed.includes(p.id));
+  // Filter stores based on operator role
+  const visibleStores = (() => {
+    if (!operator || !operatorProfile) return stores;
+    if (operatorProfile.role === "store_manager") {
+      const allowed = operatorProfile.storeIds ?? [];
+      return stores.filter((s) => allowed.includes(s.id));
     }
-    // department_chair and academic_advisor see all
-    return programList;
+    // regional_manager sees all
+    return stores;
   })();
 
   const hasAccess = !!operator;
@@ -92,7 +94,7 @@ function SidebarInner() {
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       } md:translate-x-0`}>
         <div className="flex items-center justify-between px-4 py-4">
-          <p className="text-[13px] font-bold text-gray-900">CourseAI</p>
+          <p className="text-[13px] font-bold text-gray-900">FloorAI</p>
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
@@ -131,35 +133,35 @@ function SidebarInner() {
 
           <div className="mt-6">
             <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-              Programs
+              Stores
             </p>
             <div className="mt-2 space-y-0.5">
-              {visiblePrograms.map((program) => {
-                const isActiveProgram = activeProgramParam === program.id;
-                const targetPath = pathname.startsWith("/department")
-                  ? `/department?program=${program.id}`
-                  : `/course?program=${program.id}`;
+              {visibleStores.map((store) => {
+                const isActiveStore = activeStoreParam === store.id;
+                const targetPath = pathname.startsWith("/regional")
+                  ? `/regional?store=${store.id}`
+                  : `/store?store=${store.id}`;
                 return hasAccess ? (
                   <Link
-                    key={program.id}
+                    key={store.id}
                     href={targetPath}
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center justify-between rounded-md px-3 py-1 text-[13px] transition ${
-                      isActiveProgram
+                      isActiveStore
                         ? "bg-indigo-50 text-indigo-600 font-medium"
                         : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                   >
-                    <span>{program.name}</span>
-                    <span className={`text-[11px] ${isActiveProgram ? "text-indigo-400" : "text-gray-400"}`}>{program.id}</span>
+                    <span>{store.name}</span>
+                    <span className={`text-[11px] ${isActiveStore ? "text-indigo-400" : "text-gray-400"}`}>{store.id}</span>
                   </Link>
                 ) : (
                   <div
-                    key={program.id}
+                    key={store.id}
                     className="flex items-center justify-between rounded-md px-3 py-1 text-[13px] text-gray-300 cursor-not-allowed"
                   >
-                    <span>{program.name}</span>
-                    <span className="text-[11px] text-gray-300">{program.id}</span>
+                    <span>{store.name}</span>
+                    <span className="text-[11px] text-gray-300">{store.id}</span>
                   </div>
                 );
               })}

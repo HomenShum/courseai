@@ -18,8 +18,8 @@ interface IssueContext {
 
 interface ChatPanelProps {
   operatorId: string;
-  programId?: string;
-  campusId?: string;
+  storeId?: string;
+  regionId?: string;
   issueContext?: IssueContext;
   onClearIssue?: () => void;
   operatorName?: string;
@@ -722,53 +722,56 @@ function getGreeting(): string {
   return "Good evening";
 }
 
-function buildProgramGreeting(
-  programId: string,
-  facultyData: any,
-  courseMetrics: any
+function buildStoreGreeting(
+  storeId: string,
+  staffingData: any,
+  storeMetrics: any
 ): string {
   const parts: string[] = [];
-  if (courseMetrics && courseMetrics.underReviewCount > 0) {
-    parts.push(`${courseMetrics.underReviewCount} course${courseMetrics.underReviewCount !== 1 ? "s" : ""} under review`);
+  if (staffingData) {
+    parts.push(
+      `You have ${staffingData.scheduledCount} scheduled, ${staffingData.actualCount} showed up, ${staffingData.noShowCount} no-show${staffingData.noShowCount !== 1 ? "s" : ""}`
+    );
   }
-  if (courseMetrics && courseMetrics.overloadedFacultyCount > 0) {
-    parts.push(`${courseMetrics.overloadedFacultyCount} faculty overloaded`);
+  if (storeMetrics && storeMetrics.lowStockCount > 0) {
+    parts.push(`${storeMetrics.lowStockCount} low stock item${storeMetrics.lowStockCount !== 1 ? "s" : ""} need attention`);
   }
   if (parts.length > 0) {
-    return `Here's your workspace for program ${programId}. ${parts.join(". ")}. Ask about enrollment, curriculum gaps, prerequisites, or upload documents.`;
+    return `Here's your workspace for store ${storeId}. ${parts.join(". ")}. Ask for triage, policy interpretation, risk summaries, or upload evidence.`;
   }
-  return `Here's your workspace for program ${programId}. Ask about enrollment, curriculum gaps, prerequisites, or upload documents.`;
+  return `Here's your workspace for store ${storeId}. Ask for triage, policy interpretation, risk summaries, or upload evidence.`;
 }
 
-function buildDepartmentGreeting(
-  campusId: string | undefined,
-  courses: any[] | undefined
+function buildRegionalGreeting(
+  regionId: string | undefined,
+  issues: any[] | undefined
 ): string {
-  if (!courses || courses.length === 0) {
-    return `Here's your department overview${campusId ? ` for ${campusId}` : ""}. Ask about program health, accreditation compliance, or curriculum gaps.`;
+  if (!issues || issues.length === 0) {
+    return `Here's your regional overview${regionId ? ` for ${regionId}` : ""}. Ask about store performance, escalations, or cross-store patterns.`;
   }
-  const underReview = courses.filter((c: any) => c.status === "under_review");
-  const proposed = courses.filter((c: any) => c.status === "proposed");
+  const openIssues = issues.filter((i: any) => i.status !== "resolved");
+  const criticalCount = openIssues.filter((i: any) => i.severity === "critical").length;
+  const escalatedCount = openIssues.filter((i: any) => i.escalatedToRegional).length;
   const parts: string[] = [];
-  if (underReview.length > 0) {
-    parts.push(`${underReview.length} course${underReview.length !== 1 ? "s" : ""} under review`);
+  if (criticalCount > 0) {
+    parts.push(`${criticalCount} critical issue${criticalCount !== 1 ? "s" : ""}`);
   }
-  if (proposed.length > 0) {
-    parts.push(`${proposed.length} proposed course${proposed.length !== 1 ? "s" : ""}`);
+  if (escalatedCount > 0) {
+    parts.push(`${escalatedCount} escalated case${escalatedCount !== 1 ? "s" : ""}`);
   }
   if (parts.length > 0) {
-    return `Here's your department overview${campusId ? ` for ${campusId}` : ""}. ${parts.join(" and ")} need your attention. Ask about program health, accreditation compliance, or curriculum gaps.`;
+    return `Here's your regional overview${regionId ? ` for ${regionId}` : ""}. ${parts.join(" and ")} need your attention. Ask about store performance, escalations, or cross-store patterns.`;
   }
-  return `Here's your department overview${campusId ? ` for ${campusId}` : ""}. ${courses.length} course${courses.length !== 1 ? "s" : ""} across programs. Ask about program health, accreditation compliance, or curriculum gaps.`;
+  return `Here's your regional overview${regionId ? ` for ${regionId}` : ""}. ${openIssues.length} open issue${openIssues.length !== 1 ? "s" : ""} across stores. Ask about store performance, escalations, or cross-store patterns.`;
 }
 
 function buildSharedGreeting(): string {
-  return "This is the shared faculty channel. Ask for curriculum reviews, cross-program analysis, or a grounded summary of the current conversation and uploaded documents.";
+  return "This is the shared operator channel. Ask for a daily watch, region-wide risks, or a grounded summary of the current conversation and uploaded evidence.";
 }
 
-export function ChatPanel({ operatorId, programId, campusId, issueContext, onClearIssue, operatorName, sharedSessionId, embedded }: ChatPanelProps) {
+export function ChatPanel({ operatorId, storeId, regionId, issueContext, onClearIssue, operatorName, sharedSessionId, embedded }: ChatPanelProps) {
   const chatPagePathname = usePathname();
-  const scopeKey = programId || campusId || "global";
+  const scopeKey = storeId || regionId || "global";
   const [input, setInput] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
@@ -782,17 +785,17 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
   const createFileRecord = useMutation(api.files.create);
 
   // Shift-aware greeting data
-  const facultyData = useQuery(
-    api.faculty.getAll,
-    programId ? { operatorId } : "skip"
+  const staffingData = useQuery(
+    api.staffing.getLatestByStore,
+    storeId ? { operatorId, storeId } : "skip"
   );
-  const courseMetrics = useQuery(
-    api.operations.getCourseMetrics,
-    programId ? { operatorId, programId } : "skip"
+  const storeMetrics = useQuery(
+    api.operations.getStoreMetrics,
+    storeId ? { operatorId, storeId } : "skip"
   );
-  const departmentCourses = useQuery(
-    api.courses.getAll,
-    campusId ? { operatorId } : "skip"
+  const regionalIssues = useQuery(
+    api.issues.getAll,
+    regionId ? { operatorId } : "skip"
   );
   const messages = useQuery(
     api.messages.getBySession,
@@ -800,8 +803,8 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
       ? {
           operatorId,
           sessionId,
-          programId,
-          campusId,
+          storeId,
+          regionId,
         }
       : "skip"
   );
@@ -811,8 +814,8 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
       ? {
           operatorId,
           sessionId,
-          programId,
-          campusId,
+          storeId,
+          regionId,
         }
       : "skip"
   );
@@ -822,8 +825,8 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
       ? {
           operatorId,
           sessionId,
-          programId,
-          campusId,
+          storeId,
+          regionId,
         }
       : "skip"
   );
@@ -872,21 +875,21 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
       issueContext
         ? [
             `What's the current status of ${issueContext.issueId}?`,
-            `What accreditation policy applies to this course?`,
-            `What are the recommended next steps?`,
+            `What policy applies to this issue?`,
+            `What are the recommended next steps for resolution?`,
           ]
-        : programId
+        : storeId
           ? [
-              "What courses need my attention right now?",
-              "Show me the enrollment trends and any at-risk courses.",
-              "What prerequisite chains might be causing bottlenecks?",
+              "What issues need my attention right now?",
+              "Review the current evidence and tell me what to escalate.",
+              "What policy applies to our biggest open risk today?",
             ]
           : [
-              "Which programs need curriculum attention first?",
-              "What curriculum gaps are emerging across programs?",
-              "Summarize faculty load and accreditation compliance.",
+              "Which stores need intervention first?",
+              "What cross-store patterns are emerging?",
+              "Summarize the highest-risk escalations and next actions.",
             ],
-    [programId, issueContext?.issueId]
+    [storeId, issueContext?.issueId]
   );
 
   const latestMetadata = useMemo(() => {
@@ -932,7 +935,7 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
     setError(null);
     setLoading(true);
     setIsOpen(true);
-    const baseQuery = input.trim() || "Review the attached documents and tell me the recommended curriculum action.";
+    const baseQuery = input.trim() || "Review the attached evidence and tell me the operational next step.";
     const query = issueContext
       ? `[Issue Thread: ${issueContext.issueId} — ${issueContext.title}]\n${issueContext.description}\n\nUser question: ${baseQuery}`
       : baseQuery;
@@ -948,11 +951,11 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
               context: {
                 operatorId,
                 sessionId,
-                programId,
-                campusId,
-                uploadedBy: programId
-                  ? `Professor ${programId}`
-                  : `Department Chair ${campusId || "Main Campus"}`,
+                storeId,
+                regionId,
+                uploadedBy: storeId
+                  ? `Manager ${storeId}`
+                  : `Regional Manager ${regionId || "REG-NE"}`,
               },
             })
           : [];
@@ -960,8 +963,8 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
       await chat({
         operatorId,
         query,
-        programId,
-        campusId,
+        storeId,
+        regionId,
         sessionId,
         senderName: operatorName,
         fileIds: uploadedFiles.map((file) => file.fileId),
@@ -984,7 +987,7 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
         >
           <p className="text-left text-xs uppercase tracking-[0.18em] text-slate-400">Assistant</p>
           <p className="mt-1 text-sm font-semibold text-slate-900">
-            {programId ? `Program ${programId}` : `Campus ${campusId || "Main"}`}
+            {storeId ? `Store ${storeId}` : `Region ${regionId || "REG-NE"}`}
           </p>
           {latestMetadata ? (
             <p className="mt-1 text-xs text-slate-500">
@@ -1028,11 +1031,11 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
                 <>
                   <h2 className="text-sm font-semibold text-slate-900">AI Assistant</h2>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    {sharedSessionId && !programId && !campusId
+                    {sharedSessionId && !storeId && !regionId
                       ? "Shared channel session"
-                      : programId
-                        ? `Program: ${programId}`
-                        : `Campus: ${campusId || "All"}`}
+                      : storeId
+                        ? `Store: ${storeId}`
+                        : `Region: ${regionId || "All"}`}
                   </p>
                 </>
               )}
@@ -1051,7 +1054,7 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
               label="Mode"
               primary="Session retained"
               secondary={
-                sharedSessionId && !programId && !campusId
+                sharedSessionId && !storeId && !regionId
                   ? "Scoped to shared channel"
                   : "Scoped to current workspace"
               }
@@ -1085,11 +1088,11 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
                 <p className="mt-1 text-sm leading-6 text-slate-600">
                   {issueContext
                     ? `Thread for ${issueContext.issueId}. Ask about status, policy, or next steps for this issue.`
-                    : sharedSessionId && !programId && !campusId
+                    : sharedSessionId && !storeId && !regionId
                       ? buildSharedGreeting()
-                      : programId
-                        ? buildProgramGreeting(programId, facultyData, courseMetrics)
-                        : buildDepartmentGreeting(campusId, departmentCourses)}
+                      : storeId
+                        ? buildStoreGreeting(storeId, staffingData, storeMetrics)
+                        : buildRegionalGreeting(regionId, regionalIssues)}
                 </p>
               </div>
               <div className="grid gap-2">
@@ -1236,7 +1239,7 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-3 sm:flex-row">
               <label className="btn-secondary flex w-full cursor-pointer items-center justify-center px-4 py-3 sm:w-auto">
-                Attach document
+                Attach evidence
                 <input
                   name="chatAttachments"
                   type="file"
@@ -1257,7 +1260,7 @@ export function ChatPanel({ operatorId, programId, campusId, issueContext, onCle
                 type="text"
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                placeholder="Ask about enrollment, curriculum, accreditation, or the attached documents."
+                placeholder="Ask about risk, policy, escalation, or the attached evidence."
                 className="field-input flex-1"
                 disabled={loading}
               />

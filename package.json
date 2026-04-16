@@ -1,6 +1,5 @@
 {
-  "name": "courseai",
-  "description": "Education course planning support tool",
+  "name": "floorai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,7 +14,9 @@
     "eval:validate": "python -m agents.retail_ops.evaluate --validate-only",
     "eval:goldens": "python -m agents.retail_ops.evaluate",
     "eval:live": "convex run eval:runEval",
-    "eval:live:local": "node scripts/live-eval.mjs"
+    "eval:live:local": "node scripts/live-eval.mjs",
+    "video:studio": "npm --prefix video run studio",
+    "video:render": "npm --prefix video run render"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.63",

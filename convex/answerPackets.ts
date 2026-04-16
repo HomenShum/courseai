@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { query, internalMutation } from "./_generated/server";
-import { requireCampusAccess, requireProgramAccess } from "./access";
+import { requireRegionAccess, requireStoreAccess } from "./access";
 
 export const create = internalMutation({
   args: {
@@ -9,8 +9,8 @@ export const create = internalMutation({
     messageId: v.optional(v.id("messages")),
     sessionId: v.string(),
     operatorId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     query: v.string(),
     answer: v.string(),
     references: v.array(v.string()),
@@ -33,15 +33,15 @@ export const getLatestBySession = query({
   args: {
     operatorId: v.string(),
     sessionId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
 
     const packets = await ctx.db

@@ -85,9 +85,9 @@ export function GroupChat({ operatorId, operatorName }: GroupChatProps) {
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {[
-                  "Which programs need curriculum attention first?",
-                  "Any prerequisite bottlenecks I should know about?",
-                  "Summarize accreditation compliance status.",
+                  "What's the biggest risk across all stores right now?",
+                  "Any cross-store patterns I should know about?",
+                  "Summarize today's open escalations.",
                 ].map((s) => (
                   <button
                     key={s}
@@ -103,7 +103,7 @@ export function GroupChat({ operatorId, operatorName }: GroupChatProps) {
 
           {sorted.map((msg: any, i: number) => {
             const isUser = msg.role === "user";
-            const sender = isUser ? (msg.senderName || "Operator") : "CourseAI";
+            const sender = isUser ? (msg.senderName || "Operator") : "FloorAI";
             const showHeader =
               i === 0 ||
               sorted[i - 1].role !== msg.role ||
@@ -143,7 +143,7 @@ export function GroupChat({ operatorId, operatorName }: GroupChatProps) {
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-800 text-[11px] font-bold text-white">
                   AI
                 </div>
-                <span className="text-[13px] font-semibold text-gray-900">CourseAI</span>
+                <span className="text-[13px] font-semibold text-gray-900">FloorAI</span>
               </div>
               <div className="pl-9">
                 <div className="flex items-center gap-1.5">

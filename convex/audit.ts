@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 
-import { requireOperator, requireCampusAccess, requireProgramAccess } from "./access";
+import { requireOperator, requireRegionAccess, requireStoreAccess } from "./access";
 import { internalMutation, mutation, query } from "./_generated/server";
 
 async function nextEventId(ctx: any) {
@@ -19,8 +19,8 @@ export const record = internalMutation({
     eventType: v.string(),
     status: v.string(),
     summary: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     entityId: v.optional(v.string()),
     detailsJson: v.optional(v.string()),
   },
@@ -34,8 +34,8 @@ export const record = internalMutation({
       actorId: operator.operatorId,
       actorName: operator.name,
       actorRole: operator.role,
-      programId: args.programId,
-      campusId: args.campusId,
+      storeId: args.storeId,
+      regionId: args.regionId,
       entityId: args.entityId,
       summary: args.summary,
       detailsJson: args.detailsJson,
@@ -48,22 +48,22 @@ export const record = internalMutation({
 export const listRecent = query({
   args: {
     operatorId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
     const rows = await ctx.db.query("eventLogs").collect();
     return rows
       .filter((row: any) => {
-        if (args.programId) return row.programId === args.programId;
-        if (args.campusId) return row.campusId === args.campusId;
+        if (args.storeId) return row.storeId === args.storeId;
+        if (args.regionId) return row.regionId === args.regionId || row.storeId === "STR-ALL";
         return row.actorId === args.operatorId;
       })
       .sort((a: any, b: any) => b.createdAt.localeCompare(a.createdAt))

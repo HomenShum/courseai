@@ -1,6 +1,6 @@
-# CourseAI Agent Workflow
+# Retail Ops Agent Workflow
 
-This repository adopts the lifecycle and quality bar from `addyosmani/agent-skills`, adapted for an education course planning AI product built with Next.js, Convex, Gemini, and Python Deep Agents.
+This repository adopts the lifecycle and quality bar from `addyosmani/agent-skills`, adapted for a retail operations AI product built with Next.js, Convex, Gemini, and Python Deep Agents.
 
 ## Default Workflow
 

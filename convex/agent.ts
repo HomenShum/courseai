@@ -21,149 +21,134 @@ type ChatActionResult = {
 
 const FUNCTION_DECLARATIONS = [
   {
-    name: "search_courses",
+    name: "search_issues",
     description:
-      "Search for courses. Can filter by program, type, status, or keyword. Use program_id='ALL' to search all programs.",
+      "Search for operational issues. Can filter by store, type, severity, status, or keyword. Use store_id='ALL' to search all stores.",
     parametersJsonSchema: {
       type: "object",
       properties: {
-        program_id: {
+        store_id: {
           type: "string",
-          description: "Program ID (e.g., PRG-CS-BS). Use 'ALL' for all programs.",
+          description: "Store ID (e.g., STR-101). Use 'ALL' for all stores.",
         },
-        type: {
+        issue_type: {
           type: "string",
           description:
-            "Filter: core, elective, capstone, lab",
+            "Filter: inventory_gap, staffing, equipment_failure, compliance, customer_escalation, operational, theft_shrinkage, strategic, cross_store_pattern",
+        },
+        severity: {
+          type: "string",
+          description: "Filter: critical, high, medium, low",
         },
         status: {
           type: "string",
-          description: "Filter: active, under_review, proposed, deprecated",
+          description: "Filter: open, in_progress, resolved",
         },
         keyword: {
           type: "string",
-          description: "Optional keyword such as machine learning, prerequisite, CS201, or CRS-003.",
+          description: "Optional keyword such as vendor, cooler, legal, or ISS-003.",
         },
       },
-      required: ["program_id"],
+      required: ["store_id"],
     },
   },
   {
-    name: "search_curricular_policies",
+    name: "search_policies",
     description:
-      "Search curricular policies by policy ID or keyword. Returns policy references for accreditation, prerequisites, enrollment, and credit hour standards.",
+      "Search company policies by policy ID or keyword. Returns policy references that should ground the recommendation.",
     parametersJsonSchema: {
       type: "object",
       properties: {
         policy_id: {
           type: "string",
-          description: "Policy ID (e.g., POL-ABET-001)",
+          description: "Policy ID (e.g., POL-INV-003)",
         },
         keyword: {
           type: "string",
-          description: "Search keyword, such as accreditation, prerequisite, enrollment, or credit",
+          description: "Search keyword, such as vendor, staffing, or legal",
         },
       },
     },
   },
   {
-    name: "get_enrollment_data",
+    name: "lookup_inventory",
     description:
-      "Look up enrollment data for a course. Returns enrollment counts, capacity, waitlist, completion rates, average grades, and drop rates across semesters.",
+      "Look up inventory levels for a store. Returns stock quantities, reorder points, supplier info, last delivery dates.",
     parametersJsonSchema: {
       type: "object",
       properties: {
-        course_id: {
+        store_id: {
           type: "string",
-          description: "Course ID (e.g., CRS-001)",
+          description: "Store ID (e.g., STR-101)",
         },
-        semester: {
+        sku: {
           type: "string",
-          description: "Optional specific semester (e.g., Fall 2026)",
+          description: "Optional specific product SKU (e.g., SKU-4411)",
         },
       },
-      required: ["course_id"],
+      required: ["store_id"],
     },
   },
   {
-    name: "get_faculty_summary",
+    name: "search_past_resolutions",
     description:
-      "Get faculty information for a program including expertise, course loads, and overload status.",
+      "Search historical resolved cases for similar operational issues and what worked previously.",
     parametersJsonSchema: {
       type: "object",
       properties: {
-        program_id: {
-          type: "string",
-          description: "Program ID (e.g., PRG-CS-BS)",
-        },
-      },
-      required: ["program_id"],
-    },
-  },
-  {
-    name: "get_course_summary",
-    description:
-      "Get course metrics for a program including active/under-review/proposed counts, completion rates, utilization, and faculty load status.",
-    parametersJsonSchema: {
-      type: "object",
-      properties: {
-        program_id: {
-          type: "string",
-          description: "Program ID (e.g., PRG-CS-BS)",
-        },
-      },
-      required: ["program_id"],
-    },
-  },
-  {
-    name: "get_program_overview",
-    description:
-      "Get aggregate overview for a campus or department including program count, course distribution, faculty load, and curriculum gap count.",
-    parametersJsonSchema: {
-      type: "object",
-      properties: {
-        campus_id: {
-          type: "string",
-          description: "Campus (e.g., Main Campus)",
-        },
-      },
-      required: ["campus_id"],
-    },
-  },
-  {
-    name: "search_reviews",
-    description:
-      "Search course reviews including student evaluations, peer reviews, accreditation audits, and curriculum gap analyses.",
-    parametersJsonSchema: {
-      type: "object",
-      properties: {
-        course_id: {
-          type: "string",
-          description: "Optional course ID to filter reviews",
-        },
-        type: {
+        issue_type: {
           type: "string",
           description:
-            "Optional review type: student_eval, peer_review, accreditation_audit, curriculum_gap",
+            "Optional issue type such as staffing, inventory_gap, equipment_failure, or customer_escalation",
         },
         query: {
           type: "string",
-          description: "Free-text description of what to search for in reviews",
+          description: "Free-text description of the current issue or desired precedent",
         },
       },
       required: ["query"],
     },
   },
   {
-    name: "create_action_item",
+    name: "get_store_metrics",
     description:
-      "Create a tracked follow-up action item for a course, program, or campus when the recommendation requires an owner and due date.",
+      "Get store metrics including open issues, critical issues, low-stock count, revenue impact, and latest staffing snapshot.",
     parametersJsonSchema: {
       type: "object",
       properties: {
-        course_id: { type: "string" },
-        program_id: { type: "string" },
-        campus_id: { type: "string" },
+        store_id: {
+          type: "string",
+          description: "Store ID (e.g., STR-101)",
+        },
+      },
+      required: ["store_id"],
+    },
+  },
+  {
+    name: "get_regional_summary",
+    description:
+      "Get aggregate operational summary for a region including critical issues, at-risk stores, open action items, and estimated revenue impact.",
+    parametersJsonSchema: {
+      type: "object",
+      properties: {
+        region_id: {
+          type: "string",
+          description: "Region ID (e.g., REG-NE)",
+        },
+      },
+      required: ["region_id"],
+    },
+  },
+  {
+    name: "create_action_item",
+    description:
+      "Create a tracked follow-up action item for a store or region when the recommendation requires owner and due date.",
+    parametersJsonSchema: {
+      type: "object",
+      properties: {
+        issue_id: { type: "string" },
+        store_id: { type: "string" },
+        region_id: { type: "string" },
         title: { type: "string" },
         description: { type: "string" },
         assignee: { type: "string" },
@@ -180,30 +165,35 @@ const FUNCTION_DECLARATIONS = [
     },
   },
   {
-    name: "list_action_items",
+    name: "create_issue",
     description:
-      "List existing action items, optionally filtered by program or campus.",
+      "Create a new issue when the user is reporting something not already tracked.",
     parametersJsonSchema: {
       type: "object",
       properties: {
-        program_id: { type: "string" },
-        campus_id: { type: "string" },
+        store_id: { type: "string" },
+        region_id: { type: "string" },
+        title: { type: "string" },
+        description: { type: "string" },
+        issue_type: { type: "string" },
+        severity: { type: "string" },
+        reporter_name: { type: "string" },
+        reporter_role: { type: "string" },
+        related_policy: { type: "string" },
+        affected_sku: { type: "string" },
+        estimated_revenue_impact: { type: "number" },
       },
-    },
-  },
-  {
-    name: "search_web",
-    description:
-      "Search the web for current external information when the question requires recent facts about industry trends, accreditation updates, emerging technologies, or educational best practices.",
-    parametersJsonSchema: {
-      type: "object",
-      properties: {
-        query: {
-          type: "string",
-          description: "Search query for external information",
-        },
-      },
-      required: ["query"],
+      required: [
+        "store_id",
+        "region_id",
+        "title",
+        "description",
+        "issue_type",
+        "severity",
+        "reporter_name",
+        "reporter_role",
+        "estimated_revenue_impact",
+      ],
     },
   },
 ];
@@ -334,8 +324,8 @@ function formatSummaryValue(key: string, value: unknown) {
   }
 
   if (typeof value === "number") {
-    if (/rate|utilization|completion/i.test(key)) {
-      return `${(value * 100).toFixed(1)}%`;
+    if (/revenue|impact|cost|loss|risk|spend|value/i.test(key)) {
+      return `$${value.toLocaleString()}`;
     }
     return value.toLocaleString();
   }
@@ -358,7 +348,7 @@ function summarizeResult(result: unknown): string {
     }
     const sample = result
       .slice(0, 3)
-      .map((item: any) => item?.courseId || item?.policyId || item?.reviewId || item?.actionItemId || item?.facultyId || item?.title)
+      .map((item: any) => item?.issueId || item?.policyId || item?.resolutionId || item?.actionItemId || item?.title)
       .filter(Boolean)
       .join(", ");
     return `${result.length} records returned${sample ? ` (${sample})` : ""}`;
@@ -373,7 +363,7 @@ function summarizeResult(result: unknown): string {
   }
 
   if (typeof result === "object") {
-    const preview = ["courseId", "policyId", "reviewId", "actionItemId", "facultyId", "title"]
+    const preview = ["issueId", "policyId", "resolutionId", "actionItemId", "title"]
       .map((field) => (result as any)[field])
       .filter(Boolean)
       .join(", ");
@@ -419,7 +409,7 @@ function deriveKeywordFromQuery(query: string) {
 }
 
 function shouldUseWebSearch(query: string) {
-  return /\b(today|latest|recent|current|industry|accreditation|trend|market|employer|job|salary|emerging|regulation|standard)\b/i.test(
+  return /\b(today|latest|recent|current|vendor|regulation|osha|weather|news|legal|competitor|market|external)\b/i.test(
     query
   );
 }
@@ -445,7 +435,7 @@ function buildHistoryContents(messages: any[]) {
       {
         text:
           message.fileIds?.length > 0
-            ? `${message.content}\n\nAttached documents: ${message.fileIds.join(", ")}`
+            ? `${message.content}\n\nAttached evidence: ${message.fileIds.join(", ")}`
             : message.content,
       },
     ],
@@ -510,146 +500,201 @@ async function buildAttachmentContext(ctx: any, files: any[]) {
   return { parts, summaries };
 }
 
-function formatCourseLine(course: any) {
+function formatIssueLine(issue: any) {
   const extras = [
-    course.programId,
-    course.type,
-    course.status,
-    `${course.credits}cr`,
-    course.prerequisites?.length ? `prereqs: ${course.prerequisites.join(", ")}` : null,
+    issue.storeId && issue.storeId !== "STR-ALL" ? issue.storeId : null,
+    issue.severity,
+    issue.status,
+    issue.relatedPolicy,
+    issue.affectedSku,
+    typeof issue.estimatedRevenueImpact === "number" && issue.estimatedRevenueImpact > 0
+      ? `$${issue.estimatedRevenueImpact}`
+      : null,
   ].filter(Boolean);
-  return `- ${course.courseId} (${course.courseCode}): ${course.title}${extras.length ? ` (${extras.join(" / ")})` : ""}\n  ${course.description}`;
+  return `- ${issue.issueId}: ${issue.title}${extras.length ? ` (${extras.join(" / ")})` : ""}\n  ${issue.description}`;
 }
 
 function formatPolicyLine(policy: any) {
   return `- ${policy.policyId}: ${policy.title}\n  ${String(policy.content ?? "").slice(0, 240)}`;
 }
 
-function formatEnrollmentLine(item: any) {
-  return `- ${item.courseId} ${item.semester}: enrolled ${item.enrolled}/${item.capacity}, waitlist ${item.waitlist}, completion ${(item.completionRate * 100).toFixed(0)}%, avg grade ${item.avgGrade.toFixed(1)}`;
+function formatInventoryLine(item: any) {
+  return `- ${item.sku}: ${item.productName} / stock ${item.currentStock} / reorder ${item.reorderPoint} / supplier ${item.supplier}`;
 }
 
-function formatReviewLine(review: any) {
-  return `- ${review.reviewId} (${review.type}): ${review.courseId}\n  Findings: ${review.findings.slice(0, 200)}\n  Score: ${review.score}`;
+function formatResolutionLine(resolution: any) {
+  return `- ${resolution.resolutionId}: ${resolution.title}\n  Outcome: ${resolution.outcome}\n  Actions: ${(resolution.actionsTaken ?? []).join("; ")}`;
 }
 
 function formatBriefForPrompt(brief: any, query?: string) {
   const lowerQuery = String(query ?? "").toLowerCase();
-  const includeEnrollment =
-    /\benroll\b|\bcapacity\b|\bwaitlist\b|\bcompletion\b|\bgrade\b|\bdrop\b|\butilization\b/.test(lowerQuery);
-  const includeFaculty =
-    /\bfaculty\b|\bload\b|\boverload\b|\binstructor\b|\bteach\b|\bprofessor\b/.test(lowerQuery);
-  const includeReviews =
-    /\breview\b|\bfeedback\b|\beval\b|\baccreditation\b|\baudit\b|\bgap\b|\bstudent\b|\bscore\b/.test(
+  const primaryIssueType = brief.matchedIssues?.[0]?.issueType;
+  const includeInventory =
+    primaryIssueType === "inventory_gap" ||
+    /\binventory\b|\bdelivery\b|\bstock\b|\bsku\b|\bmilk\b|\bproduce\b/.test(lowerQuery);
+  const includeStaffing =
+    primaryIssueType === "staffing" ||
+    /\bstaff|\bcall out|\bcoverage|\bovertime|\bshift\b/.test(lowerQuery);
+  const includeResolutions =
+    /\bbefore\b|\bresolved\b|\bwhat happened\b|\bwhat worked\b|\bprecedent\b|\bhistorical\b/.test(
       lowerQuery
     );
 
   return `Scope summary:
-- programId: ${brief.scope?.programId ?? "n/a"}
-- campusId: ${brief.scope?.campusId ?? "n/a"}
-- activeCourseCount: ${brief.scope?.activeCourseCount ?? 0}
-- underReviewCount: ${brief.scope?.underReviewCount ?? 0}
+- storeId: ${brief.scope?.storeId ?? "n/a"}
+- regionId: ${brief.scope?.regionId ?? "n/a"}
+- openIssueCount: ${brief.scope?.openIssueCount ?? 0}
+- estimatedRevenueImpact: ${brief.scope?.estimatedRevenueImpact ?? 0}
 
-Matched courses:
-${brief.matchedCourses?.length ? brief.matchedCourses.slice(0, 3).map(formatCourseLine).join("\n") : "- none"}
+Matched issues:
+${brief.matchedIssues?.length ? brief.matchedIssues.slice(0, 3).map(formatIssueLine).join("\n") : "- none"}
 
-Prerequisite-linked courses:
-${brief.crossProgramCourses?.length ? brief.crossProgramCourses.slice(0, 3).map(formatCourseLine).join("\n") : "- none"}
+Cross-store related issues:
+${brief.crossStoreRelatedIssues?.length ? brief.crossStoreRelatedIssues.slice(0, 3).map(formatIssueLine).join("\n") : "- none"}
 
 Policies:
 ${brief.policies?.length ? brief.policies.slice(0, 3).map(formatPolicyLine).join("\n") : "- none"}
 
-Enrollment highlights:
-${includeEnrollment && brief.enrollmentHighlights?.length ? brief.enrollmentHighlights.slice(0, 3).map(formatEnrollmentLine).join("\n") : "- omitted"}
+Inventory highlights:
+${includeInventory && brief.inventoryHighlights?.length ? brief.inventoryHighlights.slice(0, 3).map(formatInventoryLine).join("\n") : "- omitted"}
 
-Faculty summary:
-${includeFaculty && brief.faculty?.length ? brief.faculty.map((f: any) => `- ${f.name}: ${f.courseLoad}/${f.maxLoad} load, ${f.rank}, expertise: ${f.expertise.join(", ")}`).join("\n") : "- omitted"}
+Latest staffing:
+${includeStaffing && brief.latestStaffing ? safeJsonStringify(brief.latestStaffing) : "- omitted"}
 
-Overloaded faculty:
-${includeFaculty && brief.overloadedFaculty?.length ? brief.overloadedFaculty.map((f: any) => `- ${f.name}: ${f.courseLoad}/${f.maxLoad} (OVERLOADED)`).join("\n") : "- omitted"}
+Regional staffing pressure:
+${includeStaffing && brief.highRiskStaffing?.length ? brief.highRiskStaffing.map((row: any) => `- ${row.storeId}: no-shows ${row.noShowCount}, risk ${row.staffingRisk}`).join("\n") : "- omitted"}
 
-Reviews:
-${includeReviews && brief.reviews?.length ? brief.reviews.map(formatReviewLine).join("\n") : "- omitted"}`;
+Historical resolutions:
+${includeResolutions && brief.resolutions?.length ? brief.resolutions.map(formatResolutionLine).join("\n") : "- omitted"}`;
 }
 
 function collectBriefReferences(references: Set<string>, brief: any) {
-  for (const course of [...(brief.matchedCourses ?? []), ...(brief.crossProgramCourses ?? [])]) {
-    appendReference(references, course.courseId);
-    appendReference(references, course.courseCode);
-    appendReference(references, course.programId);
+  for (const issue of [...(brief.matchedIssues ?? []), ...(brief.crossStoreRelatedIssues ?? [])]) {
+    appendReference(references, issue.issueId);
+    appendReference(references, issue.relatedPolicy);
+    appendReference(references, issue.affectedSku);
+    appendReference(references, issue.storeId);
   }
   for (const policy of brief.policies ?? []) {
     appendReference(references, policy.policyId);
   }
-  for (const review of brief.reviews ?? []) {
-    appendReference(references, review.reviewId);
+  for (const item of brief.inventoryHighlights ?? []) {
+    appendReference(references, item.sku);
   }
 }
 
 function answerNeedsCoverageFallback(answer: string, brief: any) {
   const normalized = answer.toLowerCase();
-  const primaryCourse = brief.matchedCourses?.[0];
-  const primaryPolicy = brief.policies?.[0];
+  const primaryIssue = brief.matchedIssues?.[0];
+  const primaryPolicy = brief.policies?.[0] ?? (primaryIssue?.relatedPolicy ? { policyId: primaryIssue.relatedPolicy } : null);
+  const expectedCrossStore = (brief.crossStoreRelatedIssues?.length ?? 0) > 0;
+  const expectedRevenue =
+    typeof primaryIssue?.estimatedRevenueImpact === "number"
+      ? primaryIssue.estimatedRevenueImpact > 0
+      : (brief.scope?.estimatedRevenueImpact ?? 0) > 0;
 
-  if (primaryCourse?.courseId && !new RegExp(`\\b${escapeForRegex(String(primaryCourse.courseId))}\\b`, "i").test(normalized)) {
-    if (!new RegExp(`\\b${escapeForRegex(String(primaryCourse.courseCode))}\\b`, "i").test(normalized)) {
-      return true;
-    }
+  if (primaryIssue?.issueId && !new RegExp(`\\b${escapeForRegex(String(primaryIssue.issueId))}\\b`, "i").test(normalized)) {
+    return true;
   }
   if (primaryPolicy?.policyId && !new RegExp(`\\b${escapeForRegex(String(primaryPolicy.policyId))}\\b`, "i").test(normalized)) {
+    return true;
+  }
+  if (expectedCrossStore && !/\bcross-store\b|\bsystemic\b|\bmultiple stores\b|\bpattern\b/i.test(answer)) {
+    return true;
+  }
+  if (expectedRevenue && !/\$\d|revenue impact|impact:/i.test(answer)) {
     return true;
   }
   return false;
 }
 
-function shouldUseDeterministicAnswer(query: string, brief: any, hasExternalSources: boolean) {
+function extractPolicySteps(content: string) {
+  const starts = Array.from(content.matchAll(/\((\d+)\)\s*/g));
+  if (starts.length === 0) {
+    return [];
+  }
+
+  return starts.map((match, index) => {
+    const start = match.index! + match[0].length;
+    const end = index + 1 < starts.length ? starts[index + 1].index! : content.length;
+    return `${match[1]}. ${content.slice(start, end).trim()}`;
+  });
+}
+
+function shouldUseDeterministicIssueAnswer(query: string, brief: any, hasExternalSources: boolean) {
   if (hasExternalSources) {
     return false;
   }
-  if (!brief?.matchedCourses?.length || !brief?.policies?.length) {
+  if (!brief?.matchedIssues?.length || !brief?.policies?.length) {
     return false;
   }
-  return !/\bsummary\b|\beverything\b|\bcompare\b|\btrend\b|\bdepartment\b|\bfull picture\b/i.test(query);
+  return !/\bsummary\b|\beverything\b|\bcompare\b|\btrend\b|\bregional\b|\bfull picture\b/i.test(query);
 }
 
-function buildDeterministicAnswer(args: any, brief: any) {
-  const primaryCourse = brief.matchedCourses?.[0];
-  const primaryPolicy = brief.policies?.[0];
+function buildDeterministicIssueAnswer(args: any, brief: any) {
+  const primaryIssue = brief.matchedIssues?.[0];
+  const primaryPolicy =
+    brief.policies?.find((policy: any) => policy.policyId === primaryIssue?.relatedPolicy) ??
+    brief.policies?.[0];
 
-  if (!primaryCourse || !primaryPolicy) {
+  if (!primaryIssue || !primaryPolicy) {
     return null;
   }
 
   const lines: string[] = [];
-  const relatedEnrollment = (brief.enrollmentHighlights ?? []).find(
-    (e: any) => e.courseId === primaryCourse.courseId
+  const policySteps = extractPolicySteps(String(primaryPolicy.content ?? ""));
+  const relatedInventory = (brief.inventoryHighlights ?? []).find(
+    (item: any) => item.sku && item.sku === primaryIssue.affectedSku
   );
-  const relatedCrossCourses = (brief.crossProgramCourses ?? []).slice(0, 2);
+  const relatedCrossStore = (brief.crossStoreRelatedIssues ?? []).slice(0, 2);
+  const immediatePolicySteps =
+    args.storeId && primaryIssue.issueType === "inventory_gap"
+      ? policySteps.slice(0, 4)
+      : policySteps;
 
-  if (args.programId) {
+  if (args.storeId) {
     lines.push(
-      `**${primaryCourse.courseId} (${primaryCourse.courseCode})** — ${primaryCourse.title}. ${primaryCourse.description}`
+      `**${primaryIssue.issueId}** is already tracking this: ${primaryIssue.title}. ${primaryIssue.description}`
     );
   } else {
     lines.push(
-      `The most relevant course is **${primaryCourse.courseId} (${primaryCourse.courseCode})**: ${primaryCourse.title}. ${primaryCourse.description}`
+      `The most urgent tracked issue is **${primaryIssue.issueId}**: ${primaryIssue.title}. ${primaryIssue.description}`
     );
   }
 
-  if (relatedEnrollment) {
+  if (relatedInventory) {
     lines.push(
-      `Enrollment data: **${relatedEnrollment.enrolled}/${relatedEnrollment.capacity}** enrolled (${relatedEnrollment.semester}), waitlist ${relatedEnrollment.waitlist}, completion rate ${(relatedEnrollment.completionRate * 100).toFixed(0)}%.`
+      `Current inventory signal: **${relatedInventory.sku}** is at ${relatedInventory.currentStock} units versus a reorder point of ${relatedInventory.reorderPoint}.`
+    );
+  }
+
+  if (primaryIssue.issueType === "staffing" && brief.latestStaffing) {
+    lines.push(
+      `Latest staffing snapshot: ${brief.latestStaffing.actualCount} of ${brief.latestStaffing.scheduledCount} scheduled associates are on the floor, with ${brief.latestStaffing.noShowCount} call-outs.`
     );
   }
 
   lines.push(`Per **${primaryPolicy.policyId} (${primaryPolicy.title})**:`);
-  lines.push(String(primaryPolicy.content ?? "").slice(0, 400));
+  lines.push(immediatePolicySteps.join("\n"));
 
-  if (relatedCrossCourses.length > 0) {
+  if (relatedCrossStore.length > 0) {
     lines.push(
-      `Prerequisite chain: ${relatedCrossCourses
-        .map((c: any) => `${c.courseId} (${c.courseCode})`)
-        .join(", ")} are linked.`
+      `Cross-store pattern confirmed: ${relatedCrossStore
+        .map((issue: any) => `${issue.issueId} (${issue.storeId})`)
+        .join(", ")} show the same pattern.`
+    );
+  }
+
+  if (primaryIssue.escalatedToRegional && primaryIssue.severity === "critical") {
+    lines.push("This issue has already been escalated to regional.");
+  }
+
+  if (
+    typeof primaryIssue.estimatedRevenueImpact === "number" &&
+    primaryIssue.estimatedRevenueImpact > 0
+  ) {
+    lines.push(
+      `Estimated revenue impact: **$${primaryIssue.estimatedRevenueImpact.toLocaleString()}**.`
     );
   }
 
@@ -662,7 +707,7 @@ function makeRuntimeId(prefix: string) {
 
 function extractTrackedReferences(text: string) {
   return Array.from(
-    new Set((text.match(/\b(?:CRS|POL|PRG|FAC|REV|ACT)-[A-Z0-9-]+\b/gi) ?? []).map((value) => value.toUpperCase()))
+    new Set((text.match(/\b(?:ISS|POL|SKU|STR)-[A-Z0-9-]+\b/gi) ?? []).map((value) => value.toUpperCase()))
   );
 }
 
@@ -674,12 +719,12 @@ function buildAllowedReferences(brief: any, references: Set<string>) {
   }
   collectBriefReferences(allowed, brief);
 
-  for (const review of brief.reviews ?? []) {
-    appendReference(allowed, review.reviewId);
-    appendReference(allowed, review.courseId);
+  for (const resolution of brief.resolutions ?? []) {
+    appendReference(allowed, resolution.resolutionId);
+    appendReference(allowed, resolution.issueId);
   }
-  for (const program of brief.programs ?? []) {
-    appendReference(allowed, program.programId);
+  for (const store of brief.stores ?? []) {
+    appendReference(allowed, store.storeId);
   }
 
   return allowed;
@@ -693,17 +738,25 @@ function buildQualityReport(
   sourceRefs: Map<string, any>
 ) {
   const normalized = answer.toLowerCase();
-  const primaryCourse = brief.matchedCourses?.[0];
-  const primaryPolicy = brief.policies?.[0];
-  const expectedPrereqChain =
-    (brief.crossProgramCourses?.length ?? 0) > 0 ||
-    (!brief.scope?.programId && (brief.matchedCourses?.length ?? 0) > 1);
-  const multiCourseQuestion =
-    !brief.scope?.programId ||
-    /\bsummary\b|\bfull picture\b|\bpattern\b|\btrend\b|\bcompare\b|\bwhich programs\b|\bdepartment\b/i.test(
+  const primaryIssue = brief.matchedIssues?.[0];
+  const primaryPolicy =
+    brief.policies?.find((policy: any) => policy.policyId === primaryIssue?.relatedPolicy) ??
+    brief.policies?.[0] ??
+    (primaryIssue?.relatedPolicy ? { policyId: primaryIssue.relatedPolicy } : null);
+  const expectedCrossStore =
+    (brief.crossStoreRelatedIssues?.length ?? 0) > 0 ||
+    (!brief.scope?.storeId && (brief.matchedIssues?.length ?? 0) > 1);
+  const expectedRevenue =
+    typeof primaryIssue?.estimatedRevenueImpact === "number"
+      ? primaryIssue.estimatedRevenueImpact > 0
+      : (brief.scope?.estimatedRevenueImpact ?? 0) > 0;
+  const multiIssueQuestion =
+    !brief.scope?.storeId ||
+    /\bsummary\b|\bfull picture\b|\bpattern\b|\btrend\b|\bcompare\b|\bwhich stores\b|\bintervention\b|\bregional\b/i.test(
       query
     );
   const answerRefs = extractTrackedReferences(answer);
+  const answerStores = new Set(answerRefs.filter((reference) => reference.startsWith("STR-")));
   const allowedRefs = buildAllowedReferences(brief, references);
   const unsupportedRefs = answerRefs.filter((reference) => !allowedRefs.has(reference));
   const checks: Array<{
@@ -725,74 +778,76 @@ function buildQualityReport(
   };
 
   addCheck(
-    "primary_course",
-    "Course reference",
-    !primaryCourse || new RegExp(`\\b${escapeForRegex(String(primaryCourse.courseId))}\\b|\\b${escapeForRegex(String(primaryCourse.courseCode))}\\b`, "i").test(normalized),
-    primaryCourse
-      ? new RegExp(`\\b${escapeForRegex(String(primaryCourse.courseId))}\\b|\\b${escapeForRegex(String(primaryCourse.courseCode))}\\b`, "i").test(normalized)
-        ? `Final answer references ${primaryCourse.courseId} (${primaryCourse.courseCode}).`
-        : `Final answer is missing course reference ${primaryCourse.courseId}.`
-      : "No primary course was required for this answer.",
+    "primary_issue",
+    "Tracked issue reference",
+    !primaryIssue || new RegExp(`\\b${escapeForRegex(String(primaryIssue.issueId))}\\b`, "i").test(normalized),
+    primaryIssue
+      ? new RegExp(`\\b${escapeForRegex(String(primaryIssue.issueId))}\\b`, "i").test(normalized)
+        ? `Final answer explicitly references ${primaryIssue.issueId}.`
+        : `Final answer is missing tracked issue ${primaryIssue.issueId}.`
+      : "No primary issue was required for this answer.",
     "error"
   );
 
   addCheck(
     "governing_policy",
-    "Policy reference",
+    "Governing policy reference",
     !primaryPolicy || new RegExp(`\\b${escapeForRegex(String(primaryPolicy.policyId))}\\b`, "i").test(normalized),
     primaryPolicy
       ? new RegExp(`\\b${escapeForRegex(String(primaryPolicy.policyId))}\\b`, "i").test(normalized)
-        ? `Final answer references ${primaryPolicy.policyId}.`
-        : `Final answer is missing policy reference ${primaryPolicy.policyId}.`
+        ? `Final answer explicitly references ${primaryPolicy.policyId}.`
+        : `Final answer is missing governing policy ${primaryPolicy.policyId}.`
       : "No governing policy was required for this answer.",
     "error"
   );
 
   addCheck(
     "action_steps",
-    "Actionable recommendations",
-    /(?:^|\n)\s*(?:\d+\.|-)\s+\S/m.test(answer) || /\bnext steps?\b|\brecommend\b|\baction\b/i.test(answer),
-    /(?:^|\n)\s*(?:\d+\.|-)\s+\S/m.test(answer) || /\bnext steps?\b|\brecommend\b|\baction\b/i.test(answer)
-      ? "The answer includes actionable recommendations."
-      : "The answer needs clearer action recommendations.",
-    multiCourseQuestion ? "warning" : "error"
+    "Actionable next steps",
+    /(?:^|\n)\s*(?:\d+\.|-)\s+\S/m.test(answer) || /\bnext steps?\b|\bimmediate actions?\b/i.test(answer),
+    /(?:^|\n)\s*(?:\d+\.|-)\s+\S/m.test(answer) || /\bnext steps?\b|\bimmediate actions?\b/i.test(answer)
+      ? "The answer includes explicit next-step structure."
+      : "The answer needs clearer action sequencing for the operator.",
+    multiIssueQuestion ? "warning" : "error"
   );
 
   addCheck(
-    "enrollment_context",
-    "Enrollment context",
-    !/\benroll/i.test(query) || /\d+\s*\/\s*\d+|\bcapacity\b|\benroll/i.test(answer),
-    /\benroll/i.test(query)
-      ? /\d+\s*\/\s*\d+|\bcapacity\b|\benroll/i.test(answer)
-        ? "The answer includes enrollment data."
-        : "Expected enrollment data is missing."
-      : "No enrollment context was required.",
+    "revenue_impact",
+    "Commercial impact",
+    !expectedRevenue || /\$\d|revenue impact|at risk|loss(es)?/i.test(answer),
+    expectedRevenue
+      ? /\$\d|revenue impact|at risk|loss(es)?/i.test(answer)
+        ? "The answer quantifies business impact."
+        : "Expected commercial impact is missing from the answer."
+      : "No revenue-impact mention was required.",
     "warning"
   );
 
   addCheck(
-    "prerequisite_chain",
-    "Prerequisite context",
-    !expectedPrereqChain ||
-      /\bprerequisite\b|\bchain\b|\bdependenc/i.test(answer),
-    expectedPrereqChain
-      ? /\bprerequisite\b|\bchain\b|\bdependenc/i.test(answer)
-        ? "The answer addresses prerequisite relationships."
-        : "The answer should make prerequisite relationships more explicit."
-      : "No prerequisite context was required.",
+    "cross_store_pattern",
+    "Cross-store pattern",
+    !expectedCrossStore ||
+      /\bcross-store\b|\bsystemic\b|\bmultiple stores\b|\bpattern\b/i.test(answer) ||
+      answerStores.size >= 2,
+    expectedCrossStore
+      ? /\bcross-store\b|\bsystemic\b|\bmultiple stores\b|\bpattern\b/i.test(answer) ||
+        answerStores.size >= 2
+        ? "The answer makes the broader pattern explicit."
+        : "The answer should make the cross-store pattern more explicit."
+      : "No broader cross-store pattern was required.",
     "warning"
   );
 
   addCheck(
     "priority_order",
     "Priority ordering",
-    !multiCourseQuestion ||
+    !multiIssueQuestion ||
       /(?:^|\n)\s*\d+\.\s/m.test(answer) ||
       /\bpriority\b|\bfirst\b|\bsecond\b|\bstart with\b/i.test(answer),
-    multiCourseQuestion
+    multiIssueQuestion
       ? /(?:^|\n)\s*\d+\.\s/m.test(answer) || /\bpriority\b|\bfirst\b|\bsecond\b|\bstart with\b/i.test(answer)
         ? "The answer makes prioritization explicit."
-        : "Department or multi-course answers should spell out priority order."
+        : "Regional or multi-issue answers should spell out priority order."
       : "Priority ordering is optional for this request.",
     "warning"
   );
@@ -814,8 +869,8 @@ function buildQualityReport(
     !externalFactsQuestion || sourceRefs.size > 0,
     externalFactsQuestion
       ? sourceRefs.size > 0
-        ? `External question is backed by ${sourceRefs.size} grounded source${sourceRefs.size === 1 ? "" : "s"}.`
-        : "External question was answered without grounded external sources."
+        ? `External-current question is backed by ${sourceRefs.size} grounded source${sourceRefs.size === 1 ? "" : "s"}.`
+        : "External-current question was answered without grounded external sources."
       : "No external grounding was required.",
     "warning"
   );
@@ -976,23 +1031,23 @@ async function streamTextToDraft(
 function buildFallbackPlan(args: any) {
   const steps: any[] = [];
 
-  if (args.programId) {
+  if (args.storeId) {
     steps.push({
       id: "s1",
       stepIndex: 0,
       groupId: "discover",
-      toolName: "get_course_summary",
-      purpose: "Load program course metrics and current status.",
-      args: { program_id: args.programId },
+      toolName: "get_store_metrics",
+      purpose: "Load store operating context and current risk levels.",
+      args: { store_id: args.storeId },
     });
   } else {
     steps.push({
       id: "s1",
       stepIndex: 0,
       groupId: "discover",
-      toolName: "get_program_overview",
-      purpose: "Load department overview and program health.",
-      args: { campus_id: args.campusId || "Main Campus" },
+      toolName: "get_regional_summary",
+      purpose: "Load regional operating context and at-risk stores.",
+      args: { region_id: args.regionId || "REG-NE" },
     });
   }
 
@@ -1000,15 +1055,15 @@ function buildFallbackPlan(args: any) {
     id: "s2",
     stepIndex: 0,
     groupId: "discover",
-    toolName: "search_courses",
-    purpose: "Find courses relevant to the request.",
-    args: { program_id: args.programId || "ALL", keyword: deriveKeywordFromQuery(args.query) },
+    toolName: "search_issues",
+    purpose: "Find tracked issues relevant to the request.",
+    args: { store_id: args.storeId || "ALL", keyword: deriveKeywordFromQuery(args.query) },
   });
   steps.push({
     id: "s3",
     stepIndex: 1,
     groupId: "ground",
-    toolName: "search_curricular_policies",
+    toolName: "search_policies",
     purpose: "Find policies that govern the recommendation.",
     args: { keyword: deriveKeywordFromQuery(args.query) },
     dependsOn: ["s2"],
@@ -1018,12 +1073,25 @@ function buildFallbackPlan(args: any) {
     id: "s4",
     stepIndex: 1,
     groupId: "ground",
-    toolName: "search_reviews",
-    purpose: "Pull relevant course reviews and evaluations.",
+    toolName: "search_past_resolutions",
+    purpose: "Pull precedent from historical resolved cases.",
     args: { query: args.query },
     dependsOn: ["s2"],
     injectPriorResults: ["s2"],
   });
+
+  if (args.storeId) {
+    steps.push({
+      id: "s5",
+      stepIndex: 1,
+      groupId: "ground",
+      toolName: "lookup_inventory",
+      purpose: "Inspect live inventory when stock or supplier context may change the answer.",
+      args: { store_id: args.storeId },
+      dependsOn: ["s2"],
+      injectPriorResults: ["s2"],
+    });
+  }
 
   if (shouldUseWebSearch(args.query)) {
     steps.push({
@@ -1044,7 +1112,7 @@ function buildFallbackPlan(args: any) {
     stepIndex: 2,
     groupId: "synthesize",
     toolName: "synthesize_report",
-    purpose: "Combine all gathered evidence into an education-focused answer.",
+    purpose: "Combine all gathered evidence into an operator-ready answer.",
     args: {},
     dependsOn: steps.map((step) => step.id),
     injectPriorResults: steps.map((step) => step.id),
@@ -1052,7 +1120,7 @@ function buildFallbackPlan(args: any) {
   });
 
   return {
-    summary: "Fallback plan created from scope, query intent, and known curriculum data sources.",
+    summary: "Fallback plan created from scope, query intent, and known operational data sources.",
     plan: steps,
     telemetry: {
       model: "fallback_planner",
@@ -1069,7 +1137,7 @@ async function buildHarnessPlan(apiKey: string, args: any, attachedFiles: any[],
           .join("; ")
       : "none";
 
-  const prompt = `You are planning an education curriculum agent run.
+  const prompt = `You are planning a retail operations agent run.
 
 Return JSON only with this shape:
 {
@@ -1079,25 +1147,25 @@ Return JSON only with this shape:
       "id": "s1",
       "stepIndex": 0,
       "groupId": "discover",
-      "toolName": "search_courses",
-      "args": { "program_id": "CURRENT", "keyword": "machine learning prerequisites" },
-      "purpose": "Find the relevant courses."
+      "toolName": "search_issues",
+      "args": { "store_id": "CURRENT", "keyword": "milk supplier delay" },
+      "purpose": "Find the tracked issue."
     }
   ]
 }
 
 Rules:
-- Available toolName values: web_search, search_courses, search_curricular_policies, get_enrollment_data, get_faculty_summary, get_course_summary, get_program_overview, search_reviews, create_action_item, list_action_items
+- Available toolName values: web_search, search_issues, search_policies, lookup_inventory, search_past_resolutions, get_store_metrics, get_regional_summary, create_action_item, create_issue
 - Do not include synthesize_report; it is added automatically after execution.
-- Use CURRENT for program_id or campus_id when the current scope should be used.
+- Use CURRENT for store_id or region_id when the current scope should be used.
 - Prefer internal tools first.
 - Use web_search only when current external facts would materially improve the answer.
-- Only use create_action_item when the user is explicitly asking to create or track something.
+- Only use create_action_item or create_issue when the user is explicitly asking to create or track something.
 - Keep the plan compact: 2 to 5 execution steps before synthesis.
 
 Scope:
-- programId: ${args.programId || "none"}
-- campusId: ${args.campusId || "none"}
+- storeId: ${args.storeId || "none"}
+- regionId: ${args.regionId || "none"}
 - query: ${args.query}
 - attachments: ${attachmentSummary}
 
@@ -1138,14 +1206,14 @@ ${formatBriefForPrompt(brief, args.query)}`;
             : `Run ${step?.toolName || "tool"}.`,
         args: {
           ...(step?.args ?? {}),
-          program_id:
-            step?.args?.program_id === "CURRENT" || step?.args?.program_id === "current"
-              ? args.programId
-              : step?.args?.program_id,
-          campus_id:
-            step?.args?.campus_id === "CURRENT" || step?.args?.campus_id === "current"
-              ? args.campusId || "Main Campus"
-              : step?.args?.campus_id,
+          store_id:
+            step?.args?.store_id === "CURRENT" || step?.args?.store_id === "current"
+              ? args.storeId
+              : step?.args?.store_id,
+          region_id:
+            step?.args?.region_id === "CURRENT" || step?.args?.region_id === "current"
+              ? args.regionId || "REG-NE"
+              : step?.args?.region_id,
         },
         dependsOn: Array.isArray(step?.dependsOn) ? step.dependsOn.filter(Boolean) : undefined,
         injectPriorResults: Array.isArray(step?.injectPriorResults)
@@ -1161,7 +1229,7 @@ ${formatBriefForPrompt(brief, args.query)}`;
         stepIndex: Math.max(...normalized.map((step: any) => step.stepIndex), 0) + 1,
         groupId: "synthesize",
         toolName: "synthesize_report",
-        purpose: "Combine all gathered evidence into an education-focused answer.",
+        purpose: "Combine all gathered evidence into an operator-ready answer.",
         args: {},
         dependsOn: normalized.map((step: any) => step.id),
         injectPriorResults: normalized.map((step: any) => step.id),
@@ -1193,16 +1261,16 @@ async function generateFallbackAnswer(
   attachedFiles: any[],
   brief: any
 ) {
-  const prompt = `You are producing a curriculum-grounded answer for a university faculty member or department chair.
+  const prompt = `You are producing an operationally grounded answer for a retail manager.
 
 User query:
 ${args.query}
 
 Context:
-- Scope: ${args.programId ? `program ${args.programId}` : `campus ${args.campusId || "Main Campus"}`}
+- Scope: ${args.storeId ? `store ${args.storeId}` : `region ${args.regionId || "REG-NE"}`}
 - Structured Convex brief:
 ${formatBriefForPrompt(brief, args.query)}
-- Attached documents: ${
+- Attached evidence: ${
     attachedFiles.length
       ? attachedFiles
           .map(
@@ -1214,13 +1282,14 @@ ${formatBriefForPrompt(brief, args.query)}
   }
 
 Instructions:
-- Answer with direct curriculum guidance.
-- Reference exact course IDs, course codes, policy IDs, review IDs, and enrollment data when present.
+- Answer with direct operational guidance.
+- Reference exact issue IDs, policy IDs, SKUs, dates, and revenue impact when present.
 - Use numbered steps in 1. 2. 3. form whenever action is needed.
-- If there is a prerequisite chain issue, say so explicitly.
-- If the brief contains a primary course, lead with that course ID first.
-- If the brief contains policy-backed requirements, quote the concrete thresholds from the policy context when available.
-- Only mention IDs, policies, courses, programs, and data that appear in the structured brief.
+- If there is a cross-store pattern, say so explicitly.
+- If the brief contains a primary tracked issue, lead with that issue ID first.
+- If the brief contains policy-backed actions, quote the concrete limits or thresholds from the policy context when available.
+- Only mention IDs, policies, stores, SKUs, timelines, and thresholds that appear in the structured brief.
+- Do not mention historical resolution IDs unless the user explicitly asked for precedent or prior resolution history.
 - Do not invent facts beyond the provided context.`;
 
   const { response, durationMs, telemetry } = await runModelCall(apiKey, {
@@ -1233,9 +1302,9 @@ Instructions:
 
   return {
     text: extractAssistantText(response),
-    courses: brief.matchedCourses ?? [],
+    issues: brief.matchedIssues ?? [],
     policies: brief.policies ?? [],
-    reviews: brief.reviews ?? [],
+    resolutions: brief.resolutions ?? [],
     metrics: brief.scope ?? {},
     telemetry: {
       model: MODEL_NAME,
@@ -1249,8 +1318,8 @@ export const chat = action({
   args: {
     operatorId: v.string(),
     query: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     sessionId: v.string(),
     senderName: v.optional(v.string()),
     fileIds: v.optional(v.array(v.string())),
@@ -1346,8 +1415,8 @@ export const chat = action({
       await ctx.runMutation(api.messages.appendEvent, {
         messageId: draftMessageId,
         sessionId: args.sessionId,
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
         eventType,
         sequence: eventSequence,
         summary,
@@ -1357,38 +1426,38 @@ export const chat = action({
     };
 
     try {
-      if (args.programId) {
-        await ctx.runQuery(api.programs.getById, {
+      if (args.storeId) {
+        await ctx.runQuery(api.stores.getById, {
           operatorId: args.operatorId,
-          programId: args.programId,
+          storeId: args.storeId,
         });
-      } else if (args.campusId) {
-        await ctx.runQuery(api.programs.getByCampus, {
+      } else if (args.regionId) {
+        await ctx.runQuery(api.stores.getByRegion, {
           operatorId: args.operatorId,
-          campusId: args.campusId,
+          regionId: args.regionId,
         });
       }
 
       const existingMessages = await ctx.runQuery(api.messages.getBySession, {
         operatorId: args.operatorId,
         sessionId: args.sessionId,
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
       });
       const attachedFiles =
         args.fileIds && args.fileIds.length > 0
           ? await ctx.runQuery(api.files.getByIds, {
               operatorId: args.operatorId,
               fileIds: args.fileIds,
-              programId: args.programId,
-              campusId: args.campusId,
+              storeId: args.storeId,
+              regionId: args.regionId,
             })
           : [];
       qualityBrief = await ctx.runQuery(api.briefs.getAgentBrief, {
         operatorId: args.operatorId,
         query: args.query,
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
       });
       collectBriefReferences(references, qualityBrief);
       const userTimestamp = Date.now();
@@ -1398,8 +1467,8 @@ export const chat = action({
         content: args.query,
         senderName: args.senderName,
         status: "completed",
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
         sessionId: args.sessionId,
         createdAt: userTimestamp,
         updatedAt: userTimestamp,
@@ -1411,8 +1480,8 @@ export const chat = action({
 
       draftMessageId = await ctx.runMutation(api.messages.createDraftAssistant, {
         sessionId: args.sessionId,
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
         createdAt: Date.now(),
         metadataJson: safeJsonStringify({
           model: MODEL_NAME,
@@ -1425,9 +1494,9 @@ export const chat = action({
         query: args.query,
       });
 
-      const systemPrompt = args.programId
-        ? `You are a Course Planning Assistant for a university computer science department. The user is a professor for program ${args.programId}. Prefer internal tools for course data, enrollment, reviews, and curricular policies. Use Google Search only when current external information materially improves the answer. Reference exact course IDs, course codes, policy IDs, enrollment figures, and concrete next steps. Distinguish immediate actions from long-term curriculum changes. Create action items when the answer clearly requires tracked execution. When reviewing courses, reference student evaluation scores, peer review findings, and accreditation requirements.`
-        : `You are a Department Curriculum Assistant. The user is the department chair for campus ${args.campusId || "Main Campus"}. Prefer internal tools for course data, enrollment, reviews, and curricular policies. Use Google Search only when current external information materially improves the answer. Identify cross-program patterns, quantify curriculum gaps, recommend prioritized actions, and create action items when multi-program follow-up is needed. Monitor faculty load balance and accreditation compliance across programs.`;
+      const systemPrompt = args.storeId
+        ? `You are a Store Operations Assistant for a retail grocery chain. The user is the store manager for store ${args.storeId}. Prefer internal tools for store data, staffing, resolutions, and policies. Use Google Search only when current external information materially improves the answer. Reference exact issue IDs, policy IDs, SKUs, dates, and concrete next steps. Distinguish immediate actions from follow-up actions. Create action items when the answer clearly requires tracked execution. ALWAYS check search_past_resolutions when handling an issue that has been resolved before or is similar to a past issue. Proactively suggest what worked last time. When referencing vendor contacts, phone numbers, or email addresses from policies, format them prominently so the operator can act immediately.`
+        : `You are a Regional Operations Assistant. The user is the regional manager for region ${args.regionId || "REG-NE"}. Prefer internal tools for store data, staffing, resolutions, and policies. Use Google Search only when current external information materially improves the answer. Identify cross-store patterns, quantify risk, recommend immediate actions first, and create action items when multi-store follow-up is needed. ALWAYS check search_past_resolutions when handling an issue that has been resolved before or is similar to a past issue. Proactively suggest what worked last time. When referencing vendor contacts, phone numbers, or email addresses from policies, format them prominently so the operator can act immediately.`;
 
       plannerResult = await buildHarnessPlan(apiKey, args, attachedFiles, qualityBrief);
       await appendStreamEvent("plan.created", `Planned ${plannerResult.plan.length} steps`, {
@@ -1439,7 +1508,7 @@ export const chat = action({
       const attachmentContext = await buildAttachmentContext(ctx, attachedFiles);
       const currentUserText =
         attachedFiles.length > 0
-          ? `${args.query}\n\nAttached documents:\n${attachmentContext.summaries.join("\n")}\nUse attached documents when they inform the recommendation.`
+          ? `${args.query}\n\nAttached evidence:\n${attachmentContext.summaries.join("\n")}\nUse attached evidence when it changes the recommendation.`
           : args.query;
       const contents: any[] = [
         ...historyContents,
@@ -1462,7 +1531,7 @@ export const chat = action({
           stepIndex: -1,
           groupId: "input",
           tool: "attachments",
-          purpose: "Attach uploaded documents to the run context.",
+          purpose: "Attach uploaded evidence to the run context.",
           durationMs: 0,
           success: true,
           summary: attachmentContext.summaries.join(" | ").slice(0, 220),
@@ -1553,58 +1622,53 @@ export const chat = action({
 
           try {
             switch (toolName) {
-              case "search_courses":
-                result = await ctx.runQuery(api.courses.search, {
+              case "search_issues":
+                result = await ctx.runQuery(api.issues.search, {
                   operatorId: args.operatorId,
-                  programId: toolArgs.program_id === "ALL" ? undefined : toolArgs.program_id,
-                  type: toolArgs.type,
+                  storeId: toolArgs.store_id === "ALL" ? undefined : toolArgs.store_id,
+                  issueType: toolArgs.issue_type,
+                  severity: toolArgs.severity,
                   status: toolArgs.status,
                   keyword: toolArgs.keyword,
                 });
                 break;
-              case "search_curricular_policies":
-                result = await ctx.runQuery(api.curricularPolicies.search, {
+              case "search_policies":
+                result = await ctx.runQuery(api.policies.search, {
                   policyId: toolArgs.policy_id,
                   keyword: toolArgs.keyword,
                 });
                 break;
-              case "get_enrollment_data":
-                result = await ctx.runQuery(api.enrollment.getByCourse, {
-                  courseId: toolArgs.course_id,
-                  semester: toolArgs.semester,
+              case "lookup_inventory":
+                result = await ctx.runQuery(api.inventory.getByStore, {
+                  storeId: toolArgs.store_id,
+                  sku: toolArgs.sku,
                 });
                 break;
-              case "get_faculty_summary":
-                result = await ctx.runQuery(api.faculty.getByProgram, {
-                  operatorId: args.operatorId,
-                  programId: toolArgs.program_id,
-                });
-                break;
-              case "get_course_summary":
-                result = await ctx.runQuery(api.operations.getCourseMetrics, {
-                  operatorId: args.operatorId,
-                  programId: toolArgs.program_id,
-                });
-                break;
-              case "get_program_overview":
-                result = await ctx.runQuery(api.operations.getDepartmentSummary, {
-                  operatorId: args.operatorId,
-                  campusId: toolArgs.campus_id,
-                });
-                break;
-              case "search_reviews":
-                result = await ctx.runQuery(api.reviews.search, {
-                  courseId: toolArgs.course_id,
-                  type: toolArgs.type,
+              case "search_past_resolutions":
+                result = await ctx.runQuery(api.resolutions.search, {
+                  issueType: toolArgs.issue_type,
                   query: toolArgs.query,
+                  limit: 5,
+                });
+                break;
+              case "get_store_metrics":
+                result = await ctx.runQuery(api.operations.getStoreMetrics, {
+                  operatorId: args.operatorId,
+                  storeId: toolArgs.store_id,
+                });
+                break;
+              case "get_regional_summary":
+                result = await ctx.runQuery(api.operations.getRegionalSummary, {
+                  operatorId: args.operatorId,
+                  regionId: toolArgs.region_id,
                 });
                 break;
               case "create_action_item":
                 result = await ctx.runMutation(api.actionItems.create, {
                   operatorId: args.operatorId,
-                  courseId: toolArgs.course_id,
-                  programId: toolArgs.program_id,
-                  campusId: toolArgs.campus_id,
+                  issueId: toolArgs.issue_id,
+                  storeId: toolArgs.store_id,
+                  regionId: toolArgs.region_id,
                   title: toolArgs.title,
                   description: toolArgs.description,
                   assignee: toolArgs.assignee,
@@ -1614,11 +1678,20 @@ export const chat = action({
                   dueAt: toolArgs.due_at,
                 });
                 break;
-              case "list_action_items":
-                result = await ctx.runQuery(api.actionItems.list, {
+              case "create_issue":
+                result = await ctx.runMutation(api.issues.create, {
                   operatorId: args.operatorId,
-                  programId: toolArgs.program_id,
-                  campusId: toolArgs.campus_id,
+                  storeId: toolArgs.store_id,
+                  regionId: toolArgs.region_id,
+                  title: toolArgs.title,
+                  description: toolArgs.description,
+                  issueType: toolArgs.issue_type,
+                  severity: toolArgs.severity,
+                  reporterName: toolArgs.reporter_name,
+                  reporterRole: toolArgs.reporter_role,
+                  relatedPolicy: toolArgs.related_policy,
+                  affectedSku: toolArgs.affected_sku,
+                  estimatedRevenueImpact: toolArgs.estimated_revenue_impact,
                 });
                 break;
               default:
@@ -1630,20 +1703,19 @@ export const chat = action({
 
           if (Array.isArray(result)) {
             for (const item of result) {
-              appendReference(references, item.courseId);
-              appendReference(references, item.courseCode);
+              appendReference(references, item.issueId);
+              appendReference(references, item.relatedPolicy);
               appendReference(references, item.policyId);
-              appendReference(references, item.reviewId);
+              appendReference(references, item.resolutionId);
               appendReference(references, item.actionItemId);
-              appendReference(references, item.programId);
-              appendReference(references, item.facultyId);
+              appendReference(references, item.affectedSku);
             }
           } else if (result && typeof result === "object") {
-            appendReference(references, (result as any).courseId);
+            appendReference(references, (result as any).issueId);
             appendReference(references, (result as any).policyId);
-            appendReference(references, (result as any).reviewId);
+            appendReference(references, (result as any).resolutionId);
             appendReference(references, (result as any).actionItemId);
-            appendReference(references, (result as any).programId);
+            appendReference(references, (result as any).affectedSku);
           }
 
           const plannedStep = plannedLookup.get(toolName ?? "");
@@ -1687,9 +1759,9 @@ export const chat = action({
       }
 
       let finalAnswer = "";
-      const deterministicAnswer = buildDeterministicAnswer(args, qualityBrief);
+      const deterministicAnswer = buildDeterministicIssueAnswer(args, qualityBrief);
       if (!assistantMessage.trim()) {
-        if (shouldUseDeterministicAnswer(args.query, qualityBrief, sourceRefs.size > 0) && deterministicAnswer) {
+        if (shouldUseDeterministicIssueAnswer(args.query, qualityBrief, sourceRefs.size > 0) && deterministicAnswer) {
           assistantMessage = deterministicAnswer;
           finalAnswer = deterministicAnswer;
           toolTrace.push({
@@ -1697,10 +1769,10 @@ export const chat = action({
             stepIndex: plannerResult.plan.length,
             groupId: "synthesize",
             tool: "deterministic_synthesis",
-            purpose: "Generate a policy-backed answer directly from the structured Convex brief for high-confidence curriculum questions.",
+            purpose: "Generate a policy-backed answer directly from the structured Convex brief for high-confidence internal issues.",
             durationMs: 0,
             success: true,
-            summary: "Rendered deterministic answer from course data and linked policy.",
+            summary: "Rendered deterministic issue answer from tracked issue and linked policy.",
             telemetry: { mode: "deterministic" },
           });
           await appendStreamEvent(
@@ -1719,15 +1791,16 @@ export const chat = action({
           assistantMessage = fallback.text;
           finalAnswer = fallback.text;
           fallbackTelemetry = fallback.telemetry;
-          for (const course of fallback.courses ?? []) {
-            appendReference(references, course.courseId);
-            appendReference(references, course.courseCode);
+          for (const issue of fallback.issues ?? []) {
+            appendReference(references, issue.issueId);
+            appendReference(references, issue.relatedPolicy);
+            appendReference(references, issue.affectedSku);
           }
           for (const policy of fallback.policies ?? []) {
             appendReference(references, policy.policyId);
           }
-          for (const review of fallback.reviews ?? []) {
-            appendReference(references, review.reviewId);
+          for (const resolution of fallback.resolutions ?? []) {
+            appendReference(references, resolution.resolutionId);
           }
           toolTrace.push({
             id: "fallback_synthesis",
@@ -1737,7 +1810,7 @@ export const chat = action({
             purpose: "Produce a final answer from internal data when the main generation path returns no text.",
             durationMs: fallback.telemetry?.durationMs ?? 0,
             success: true,
-            summary: `courses=${fallback.courses.length}, policies=${fallback.policies.length}, reviews=${fallback.reviews.length}`,
+            summary: `issues=${fallback.issues.length}, policies=${fallback.policies.length}, resolutions=${fallback.resolutions.length}`,
             telemetry: fallback.telemetry,
           });
           await appendStreamEvent("synthesis.completed", "Completed fallback synthesis", {
@@ -1750,19 +1823,19 @@ export const chat = action({
         });
       } else {
         const synthesisPrompt = `${
-          args.programId
-            ? `You are finalizing a streaming answer for the professor of ${args.programId}.`
-            : `You are finalizing a streaming answer for the department chair of ${args.campusId || "Main Campus"}.`
+          args.storeId
+            ? `You are finalizing a streaming answer for the store manager of ${args.storeId}.`
+            : `You are finalizing a streaming answer for the regional manager of ${args.regionId || "REG-NE"}.`
         }
 
-Use the draft answer and execution evidence below to produce the final education-focused response.
+Use the draft answer and execution evidence below to produce the final operator-ready response.
 - Keep all claims grounded in the provided evidence.
 - Prefer concise markdown with headings or bullets only when helpful.
-- Mention internal references such as course IDs, course codes, policy IDs, and review IDs when relevant.
+- Mention internal references such as issue IDs, policy IDs, and SKUs when relevant.
 - If external sources were gathered, rely only on those source summaries for current external claims.
-- Lead with the most relevant course or curriculum gap when one exists in the Convex brief.
-- Mention concrete enrollment figures, completion rates, faculty loads, or scores when they exist in the brief.
-- Only mention IDs, policies, courses, programs, and data that appear in the Convex brief or execution evidence below.
+- Lead with the most relevant tracked issue or cross-store pattern when one exists in the Convex brief.
+- Mention concrete revenue impact, dates, staffing counts, or inventory quantities when they exist in the brief.
+- Only mention IDs, policies, SKUs, stores, and thresholds that appear in the Convex brief or execution evidence below.
 - When action is required, format the immediate response as a numbered list using 1. 2. 3.
 - Do not mention hidden system mechanics or internal metadata structures.
 
@@ -1812,7 +1885,7 @@ ${assistantMessage}`;
           ...synthesis.telemetry,
         });
         finalAnswer =
-          shouldUseDeterministicAnswer(args.query, qualityBrief, sourceRefs.size > 0) &&
+          shouldUseDeterministicIssueAnswer(args.query, qualityBrief, sourceRefs.size > 0) &&
           deterministicAnswer
             ? deterministicAnswer
             : extractAssistantText(synthesis.response).trim() || assistantMessage;
@@ -1834,7 +1907,7 @@ ${assistantMessage}`;
             purpose: "Regenerate the answer from the structured Convex brief when the drafted answer omits required grounded details.",
             durationMs: fallback.telemetry?.durationMs ?? 0,
             success: true,
-            summary: `courses=${fallback.courses.length}, policies=${fallback.policies.length}, reviews=${fallback.reviews.length}`,
+            summary: `issues=${fallback.issues.length}, policies=${fallback.policies.length}, resolutions=${fallback.resolutions.length}`,
             telemetry: fallback.telemetry,
           });
           await appendStreamEvent(
@@ -1880,8 +1953,8 @@ ${assistantMessage}`;
         messageId: draftMessageId,
         sessionId: args.sessionId,
         operatorId: args.operatorId,
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
         query: args.query,
         answer: finalAnswer,
         references: Array.from(references),
@@ -1916,10 +1989,10 @@ ${assistantMessage}`;
         actorId: args.operatorId,
         eventType: "agent.chat.completed",
         status: "success",
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
         entityId: args.sessionId,
-        summary: `Completed assistant response for ${args.programId ?? args.campusId ?? "global"} scope.`,
+        summary: `Completed assistant response for ${args.storeId ?? args.regionId ?? "global"} scope.`,
         detailsJson: safeJsonStringify({
           references: Array.from(references),
           sourceUrlCount: sourceUrls.size,
@@ -1951,10 +2024,10 @@ ${assistantMessage}`;
         actorId: args.operatorId,
         eventType: "agent.chat.completed",
         status: "failure",
-        programId: args.programId,
-        campusId: args.campusId,
+        storeId: args.storeId,
+        regionId: args.regionId,
         entityId: args.sessionId,
-        summary: `Assistant request failed for ${args.programId ?? args.campusId ?? "global"} scope.`,
+        summary: `Assistant request failed for ${args.storeId ?? args.regionId ?? "global"} scope.`,
         detailsJson: safeJsonStringify({
           message: error?.message ?? "Unknown agent failure",
         }),

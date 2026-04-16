@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { query } from "./_generated/server";
-import { requireCampusAccess, requireProgramAccess } from "./access";
+import { requireRegionAccess, requireStoreAccess } from "./access";
 
 function tokenizeQuery(query: string) {
   return Array.from(
@@ -16,32 +16,34 @@ function tokenizeQuery(query: string) {
 }
 
 function extractReferenceMatches(query: string) {
-  const refs = query.match(/\b(?:CRS|POL|PRG|FAC|REV)-[A-Z0-9-]+\b/gi) ?? [];
+  const refs = query.match(/\b(?:ISS|POL|SKU|STR)-[A-Z0-9-]+\b/gi) ?? [];
   return new Set(refs.map((ref) => ref.toUpperCase()));
 }
 
-function rankCourse(course: any, tokens: string[], refs: Set<string>) {
+function rankIssue(issue: any, tokens: string[], refs: Set<string>) {
   const haystack = [
-    course.courseId,
-    course.courseCode,
-    course.title,
-    course.description,
-    course.type,
-    course.status,
-    course.programId,
-    ...(course.learningOutcomes ?? []),
+    issue.issueId,
+    issue.storeId,
+    issue.title,
+    issue.description,
+    issue.relatedPolicy,
+    issue.affectedSku,
+    issue.issueType,
+    issue.category,
   ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
   let score = 0;
-  if (refs.has(String(course.courseId).toUpperCase())) score += 20;
-  if (refs.has(String(course.courseCode).toUpperCase())) score += 15;
-  if (refs.has(String(course.programId).toUpperCase())) score += 8;
-  if (course.status !== "deprecated") score += 3;
-  if (course.status === "under_review") score += 4;
-  if (course.type === "core") score += 2;
+  if (refs.has(String(issue.issueId).toUpperCase())) score += 20;
+  if (refs.has(String(issue.relatedPolicy ?? "").toUpperCase())) score += 12;
+  if (refs.has(String(issue.affectedSku ?? "").toUpperCase())) score += 12;
+  if (refs.has(String(issue.storeId ?? "").toUpperCase())) score += 8;
+  if (issue.status !== "resolved") score += 3;
+  if (issue.escalatedToRegional) score += 2;
+  if (issue.severity === "critical") score += 6;
+  if (issue.severity === "high") score += 4;
 
   for (const token of tokens) {
     if (haystack.includes(token)) {
@@ -53,7 +55,7 @@ function rankCourse(course: any, tokens: string[], refs: Set<string>) {
 }
 
 function rankPolicy(policy: any, tokens: string[], refs: Set<string>) {
-  const haystack = [policy.policyId, policy.title, policy.content, policy.category, policy.accreditationBody]
+  const haystack = [policy.policyId, policy.title, policy.content, policy.category]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -67,13 +69,13 @@ function rankPolicy(policy: any, tokens: string[], refs: Set<string>) {
   return score;
 }
 
-function rankEnrollment(item: any, tokens: string[], refs: Set<string>) {
-  const haystack = [item.courseId, item.semester]
+function rankInventory(item: any, tokens: string[], refs: Set<string>) {
+  const haystack = [item.sku, item.productName, item.category, item.supplier]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
-  let score = item.enrolled < item.capacity * 0.5 ? 3 : 0;
-  if (refs.has(String(item.courseId).toUpperCase())) score += 15;
+  let score = item.currentStock <= item.reorderPoint ? 3 : 0;
+  if (refs.has(String(item.sku).toUpperCase())) score += 15;
   for (const token of tokens) {
     if (haystack.includes(token)) {
       score += 2;
@@ -86,126 +88,149 @@ export const getAgentBrief = query({
   args: {
     operatorId: v.string(),
     query: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     } else {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId ?? "Main Campus");
+      await requireRegionAccess(ctx, args.operatorId, args.regionId ?? "REG-NE");
     }
 
     const tokens = tokenizeQuery(args.query);
     const refs = extractReferenceMatches(args.query);
-    const includeReviews =
-      /\breview\b|\bfeedback\b|\beval\b|\baccreditation\b|\baudit\b|\bgap\b|\bstudent\b|\bscore\b/i.test(
+    const includeResolutions =
+      /\bbefore\b|\bresolved\b|\bwhat happened\b|\bwhat worked\b|\bprecedent\b|\bhistorical\b/i.test(
         args.query
       );
-    const campusId = args.campusId ?? "Main Campus";
+    const regionId = args.regionId ?? "REG-NE";
 
-    const programs = args.programId
+    const stores = args.storeId
       ? [
           await ctx.db
-            .query("programs")
-            .withIndex("by_programId", (q: any) => q.eq("programId", args.programId))
+            .query("stores")
+            .withIndex("by_storeId", (q: any) => q.eq("storeId", args.storeId))
             .first(),
         ].filter(Boolean)
       : await ctx.db
-          .query("programs")
-          .withIndex("by_campus", (q: any) => q.eq("campus", campusId))
+          .query("stores")
+          .withIndex("by_region", (q: any) => q.eq("regionId", regionId))
           .collect();
 
-    const programIds = new Set(programs.map((p: any) => p.programId));
-    let courses = await ctx.db.query("courses").collect();
-    courses = courses.filter(
-      (c: any) => args.programId ? c.programId === args.programId : programIds.has(c.programId)
+    const storeIds = new Set(stores.map((store: any) => store.storeId));
+    let issues = await ctx.db.query("issues").collect();
+    issues = issues.filter(
+      (issue: any) =>
+        (args.storeId ? issue.storeId === args.storeId || issue.storeId === "STR-ALL" : storeIds.has(issue.storeId) || issue.storeId === "STR-ALL")
     );
 
-    const rankedCourses = courses
-      .map((course: any) => ({ course, score: rankCourse(course, tokens, refs) }))
+    const rankedIssues = issues
+      .map((issue: any) => ({ issue, score: rankIssue(issue, tokens, refs) }))
       .filter((entry: any) => entry.score > 0)
       .sort((a: any, b: any) => b.score - a.score);
 
-    const matchedCourses = rankedCourses.slice(0, 5).map((entry: any) => entry.course);
-    const matchedCourseIds = new Set(matchedCourses.map((c: any) => c.courseId));
+    const matchedIssues = rankedIssues.slice(0, 5).map((entry: any) => entry.issue);
+    const matchedIssueIds = new Set(matchedIssues.map((issue: any) => issue.issueId));
+    const affectedSkus = new Set(
+      matchedIssues.map((issue: any) => issue.affectedSku).filter(Boolean)
+    );
+    const relatedPolicyIds = new Set(
+      matchedIssues.map((issue: any) => issue.relatedPolicy).filter(Boolean)
+    );
 
-    const crossProgramCourses = courses
-      .filter((c: any) => !matchedCourseIds.has(c.courseId))
-      .filter((c: any) => {
-        const prereqs = new Set(c.prerequisites ?? []);
-        return matchedCourses.some(
-          (mc: any) =>
-            prereqs.has(mc.courseCode) ||
-            mc.prerequisites?.includes(c.courseCode)
-        );
-      })
+    const crossStoreRelatedIssues = issues
+      .filter((issue: any) => !matchedIssueIds.has(issue.issueId))
+      .filter(
+        (issue: any) =>
+          (issue.affectedSku && affectedSkus.has(issue.affectedSku)) ||
+          (issue.relatedPolicy && relatedPolicyIds.has(issue.relatedPolicy))
+      )
       .slice(0, 6);
 
-    const allPolicies = await ctx.db.query("curricularPolicies").collect();
+    const allPolicies = await ctx.db.query("policies").collect();
     const policies = allPolicies
       .map((policy: any) => ({
         policy,
-        score: rankPolicy(policy, tokens, refs),
+        score:
+          (relatedPolicyIds.has(policy.policyId) ? 18 : 0) + rankPolicy(policy, tokens, refs),
       }))
       .filter((entry: any) => entry.score > 0)
       .sort((a: any, b: any) => b.score - a.score)
       .slice(0, 6)
       .map((entry: any) => entry.policy);
 
-    const enrollment = args.programId
-      ? (await ctx.db.query("enrollment").collect()).filter((e: any) =>
-          matchedCourseIds.has(e.courseId) || courses.some((c: any) => c.courseId === e.courseId)
-        )
+    const inventory = args.storeId
+      ? await ctx.db
+          .query("inventory")
+          .withIndex("by_store", (q: any) => q.eq("storeId", args.storeId))
+          .collect()
       : [];
-    const enrollmentHighlights = enrollment
-      .map((item: any) => ({ item, score: rankEnrollment(item, tokens, refs) }))
+    const inventoryHighlights = inventory
+      .map((item: any) => ({ item, score: rankInventory(item, tokens, refs) }))
       .filter((entry: any) => entry.score > 0)
       .sort((a: any, b: any) => b.score - a.score)
       .slice(0, 5)
       .map((entry: any) => entry.item);
 
-    const faculty = args.programId
-      ? await ctx.db
-          .query("faculty")
-          .withIndex("by_program", (q: any) => q.eq("programId", args.programId))
-          .collect()
-      : [];
-    const overloadedFaculty = faculty.filter((f: any) => f.courseLoad >= f.maxLoad);
+    const latestStaffing = args.storeId
+      ? (
+          await ctx.db
+            .query("staffing")
+            .withIndex("by_store_date", (q: any) => q.eq("storeId", args.storeId))
+            .collect()
+        ).sort((a: any, b: any) => b.date.localeCompare(a.date))[0] ?? null
+      : null;
 
-    const reviews = includeReviews
-      ? (await ctx.db.query("reviews").collect())
-          .filter((review: any) => {
-            if (matchedCourses.length === 0) {
+    const highRiskStaffing = args.storeId
+      ? []
+      : (await ctx.db.query("staffing").collect())
+          .filter(
+            (row: any) =>
+              storeIds.has(row.storeId) &&
+              (row.staffingRisk === "high" || row.noShowCount >= 2)
+          )
+          .slice(0, 5);
+
+    const resolutions = includeResolutions
+      ? (await ctx.db.query("resolutions").collect())
+          .filter((resolution: any) => {
+            if (matchedIssues.length === 0) {
               return tokens.some((token) =>
-                `${review.findings} ${review.recommendations}`
+                `${resolution.title} ${resolution.content} ${resolution.outcome}`
                   .toLowerCase()
                   .includes(token)
               );
             }
-            return matchedCourseIds.has(review.courseId);
+            return matchedIssues.some(
+              (issue: any) =>
+                resolution.issueType === issue.issueType ||
+                resolution.policyIds?.includes(issue.relatedPolicy)
+            );
           })
           .slice(0, 4)
       : [];
 
-    const activeCourseCount = courses.filter((c: any) => c.status === "active").length;
-    const underReviewCount = courses.filter((c: any) => c.status === "under_review").length;
+    const openIssueCount = issues.filter((issue: any) => issue.status !== "resolved").length;
+    const estimatedRevenueImpact = issues
+      .filter((issue: any) => issue.status !== "resolved")
+      .reduce((sum: number, issue: any) => sum + (issue.estimatedRevenueImpact ?? 0), 0);
 
     return {
       scope: {
-        programId: args.programId,
-        campusId,
-        activeCourseCount,
-        underReviewCount,
+        storeId: args.storeId,
+        regionId,
+        openIssueCount,
+        estimatedRevenueImpact,
       },
-      programs,
-      matchedCourses,
-      crossProgramCourses,
+      stores,
+      matchedIssues,
+      crossStoreRelatedIssues,
       policies,
-      enrollmentHighlights,
-      faculty,
-      overloadedFaculty,
-      reviews,
+      inventoryHighlights,
+      latestStaffing,
+      highRiskStaffing,
+      resolutions,
     };
   },
 });

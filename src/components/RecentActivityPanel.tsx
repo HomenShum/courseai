@@ -6,8 +6,8 @@ import { api } from "../../convex/_generated/api";
 
 interface RecentActivityPanelProps {
   operatorId: string;
-  programId?: string;
-  campusId?: string;
+  storeId?: string;
+  regionId?: string;
   title: string;
 }
 
@@ -19,14 +19,14 @@ const statusStyles: Record<string, string> = {
 
 export function RecentActivityPanel({
   operatorId,
-  programId,
-  campusId,
+  storeId,
+  regionId,
   title,
 }: RecentActivityPanelProps) {
   const events = useQuery(api.audit.listRecent, {
     operatorId,
-    programId,
-    campusId,
+    storeId,
+    regionId,
     limit: 10,
   });
 

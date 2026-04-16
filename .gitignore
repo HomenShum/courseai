@@ -2,7 +2,6 @@
 node_modules/
 .env.local
 .env*.local
-convex.local.env
 *.tsbuildinfo
 next-env.d.ts
 __pycache__/
@@ -11,10 +10,10 @@ __pycache__/
 eval_results/
 NUL
 .agent-skills/
+.agent-skills
+NUL
+
+.vercel
+.agent-skills/
+NUL
 .vercel/
-.dev-combined*.log
-.next-dev-clean*.log
-.tmp-agent-args.json
-.agents/
-.deepagents/
-.convex/

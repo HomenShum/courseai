@@ -7,76 +7,63 @@ export default defineSchema({
     name: v.string(),
     email: v.string(),
     role: v.string(),
-    programIds: v.array(v.string()),
-    campusIds: v.array(v.string()),
+    storeIds: v.array(v.string()),
+    regionIds: v.array(v.string()),
   }).index("by_operatorId", ["operatorId"])
     .index("by_role", ["role"]),
 
-  programs: defineTable({
-    programId: v.string(),
+  stores: defineTable({
+    storeId: v.string(),
     name: v.string(),
-    department: v.string(),
-    degreeType: v.string(),
-    accreditationStatus: v.string(),
-    totalCredits: v.number(),
-    campus: v.string(),
-    chairId: v.optional(v.string()),
-  }).index("by_campus", ["campus"])
-    .index("by_programId", ["programId"])
-    .index("by_department", ["department"]),
+    address: v.string(),
+    regionId: v.string(),
+    regionName: v.string(),
+    managerName: v.string(),
+  }).index("by_region", ["regionId"])
+    .index("by_storeId", ["storeId"]),
 
-  courses: defineTable({
-    courseId: v.string(),
-    programId: v.string(),
-    courseCode: v.string(),
+  issues: defineTable({
+    issueId: v.string(),
+    storeId: v.string(),
+    issueType: v.string(),
+    severity: v.string(),
     title: v.string(),
-    credits: v.number(),
     description: v.string(),
-    type: v.string(),
-    status: v.string(),
-    prerequisites: v.array(v.string()),
-    semester: v.string(),
-    enrollmentCap: v.number(),
-    learningOutcomes: v.array(v.string()),
-    instructorName: v.optional(v.string()),
-  }).index("by_program", ["programId"])
-    .index("by_status", ["status"])
-    .index("by_type", ["type"])
-    .index("by_courseCode", ["courseCode"])
-    .index("by_courseId", ["courseId"]),
-
-  enrollment: defineTable({
-    courseId: v.string(),
-    semester: v.string(),
-    enrolled: v.number(),
-    capacity: v.number(),
-    waitlist: v.number(),
-    completionRate: v.number(),
-    avgGrade: v.number(),
-    dropRate: v.number(),
-  }).index("by_course", ["courseId"])
-    .index("by_semester", ["semester"])
-    .index("by_course_semester", ["courseId", "semester"]),
-
-  faculty: defineTable({
-    facultyId: v.string(),
-    programId: v.string(),
-    name: v.string(),
-    expertise: v.array(v.string()),
-    courseLoad: v.number(),
-    maxLoad: v.number(),
-    rank: v.string(),
-    status: v.string(),
-  }).index("by_program", ["programId"])
-    .index("by_facultyId", ["facultyId"])
-    .index("by_status", ["status"]),
-
-  curricularPolicies: defineTable({
-    policyId: v.string(),
     category: v.string(),
+    status: v.string(),
+    createdAt: v.string(),
+    resolvedAt: v.optional(v.string()),
+    resolutionNotes: v.optional(v.string()),
+    escalatedToRegional: v.boolean(),
+    relatedPolicy: v.optional(v.string()),
+    affectedSku: v.optional(v.string()),
+    estimatedRevenueImpact: v.number(),
+    reportedByRole: v.string(),
+    reporterName: v.string(),
+  }).index("by_store", ["storeId"])
+    .index("by_status", ["status"])
+    .index("by_severity", ["severity"])
+    .index("by_type", ["issueType"])
+    .index("by_issueId", ["issueId"]),
+
+  inventory: defineTable({
+    storeId: v.string(),
+    sku: v.string(),
+    productName: v.string(),
+    category: v.string(),
+    currentStock: v.number(),
+    reorderPoint: v.number(),
+    lastDelivery: v.string(),
+    supplier: v.string(),
+  }).index("by_store", ["storeId"])
+    .index("by_sku", ["sku"])
+    .index("by_store_sku", ["storeId", "sku"]),
+
+  policies: defineTable({
+    policyId: v.string(),
     title: v.string(),
     content: v.string(),
-    accreditationBody: v.string(),
+    category: v.string(),
     effectiveDate: v.string(),
   }).index("by_policyId", ["policyId"])
     .index("by_category", ["category"])
@@ -85,27 +72,41 @@ export default defineSchema({
       filterFields: ["category"],
     }),
 
-  reviews: defineTable({
-    reviewId: v.string(),
-    courseId: v.string(),
-    type: v.string(),
-    findings: v.string(),
-    recommendations: v.string(),
-    semester: v.string(),
-    score: v.number(),
-  }).index("by_course", ["courseId"])
-    .index("by_type", ["type"])
-    .index("by_reviewId", ["reviewId"])
-    .searchIndex("search_findings", {
-      searchField: "findings",
-      filterFields: ["type"],
+  staffing: defineTable({
+    storeId: v.string(),
+    date: v.string(),
+    scheduledCount: v.number(),
+    actualCount: v.number(),
+    noShowCount: v.number(),
+    overtimeHours: v.number(),
+    staffingRisk: v.string(),
+    notes: v.optional(v.string()),
+  }).index("by_store_date", ["storeId", "date"])
+    .index("by_date", ["date"]),
+
+  resolutions: defineTable({
+    resolutionId: v.string(),
+    issueId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    issueType: v.string(),
+    title: v.string(),
+    content: v.string(),
+    actionsTaken: v.array(v.string()),
+    outcome: v.string(),
+    policyIds: v.array(v.string()),
+    createdAt: v.string(),
+  }).index("by_issueType", ["issueType"])
+    .index("by_issueId", ["issueId"])
+    .searchIndex("search_content", {
+      searchField: "content",
+      filterFields: ["issueType"],
     }),
 
   actionItems: defineTable({
     actionItemId: v.string(),
-    courseId: v.optional(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    issueId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     title: v.string(),
     description: v.string(),
     assignee: v.string(),
@@ -115,18 +116,18 @@ export default defineSchema({
     dueAt: v.optional(v.string()),
     createdAt: v.string(),
     completedAt: v.optional(v.string()),
-  }).index("by_program", ["programId"])
-    .index("by_campus", ["campusId"])
+  }).index("by_store", ["storeId"])
+    .index("by_region", ["regionId"])
     .index("by_status", ["status"])
     .index("by_priority", ["priority"])
-    .index("by_course", ["courseId"]),
+    .index("by_issue", ["issueId"]),
 
   files: defineTable({
     fileId: v.string(),
-    courseId: v.optional(v.string()),
+    issueId: v.optional(v.string()),
     sessionId: v.optional(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     filename: v.string(),
     mimeType: v.string(),
     fileCategory: v.string(),
@@ -136,10 +137,10 @@ export default defineSchema({
     uploadedAt: v.string(),
     analysisStatus: v.optional(v.string()),
     summary: v.optional(v.string()),
-  }).index("by_course", ["courseId"])
+  }).index("by_issue", ["issueId"])
     .index("by_session", ["sessionId"])
-    .index("by_program", ["programId"])
-    .index("by_campus", ["campusId"])
+    .index("by_store", ["storeId"])
+    .index("by_region", ["regionId"])
     .index("by_fileId", ["fileId"]),
 
   messages: defineTable({
@@ -147,8 +148,8 @@ export default defineSchema({
     content: v.string(),
     senderName: v.optional(v.string()),
     status: v.optional(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     sessionId: v.string(),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
@@ -161,8 +162,8 @@ export default defineSchema({
   messageEvents: defineTable({
     messageId: v.id("messages"),
     sessionId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     eventType: v.string(),
     sequence: v.number(),
     summary: v.string(),
@@ -177,8 +178,8 @@ export default defineSchema({
     messageId: v.optional(v.id("messages")),
     sessionId: v.string(),
     operatorId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     query: v.string(),
     answer: v.string(),
     references: v.array(v.string()),
@@ -194,8 +195,8 @@ export default defineSchema({
     .index("by_message", ["messageId"])
     .index("by_session", ["sessionId"])
     .index("by_session_createdAt", ["sessionId", "createdAt"])
-    .index("by_program", ["programId"])
-    .index("by_campus", ["campusId"]),
+    .index("by_store", ["storeId"])
+    .index("by_region", ["regionId"]),
 
   evalRuns: defineTable({
     evalRunId: v.string(),
@@ -235,14 +236,14 @@ export default defineSchema({
     actorId: v.string(),
     actorName: v.string(),
     actorRole: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     entityId: v.optional(v.string()),
     summary: v.string(),
     detailsJson: v.optional(v.string()),
     createdAt: v.string(),
   }).index("by_eventId", ["eventId"])
-    .index("by_program", ["programId"])
-    .index("by_campus", ["campusId"])
+    .index("by_store", ["storeId"])
+    .index("by_region", ["regionId"])
     .index("by_actor", ["actorId"]),
 });

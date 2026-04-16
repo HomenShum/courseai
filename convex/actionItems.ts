@@ -1,32 +1,32 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { requireCourseAccess, requireCampusAccess, requireProgramAccess } from "./access";
+import { requireIssueAccess, requireRegionAccess, requireStoreAccess } from "./access";
 
 export const list = query({
   args: {
     operatorId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
-    courseId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
+    issueId: v.optional(v.string()),
     status: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
     let rows = await ctx.db.query("actionItems").collect();
-    if (args.programId) {
-      rows = rows.filter((row: any) => row.programId === args.programId);
+    if (args.storeId) {
+      rows = rows.filter((row: any) => row.storeId === args.storeId);
     }
-    if (args.campusId) {
-      rows = rows.filter((row: any) => row.campusId === args.campusId);
+    if (args.regionId) {
+      rows = rows.filter((row: any) => row.regionId === args.regionId);
     }
-    if (args.courseId) {
-      rows = rows.filter((row: any) => row.courseId === args.courseId);
+    if (args.issueId) {
+      rows = rows.filter((row: any) => row.issueId === args.issueId);
     }
     if (args.status) {
       rows = rows.filter((row: any) => row.status === args.status);
@@ -38,9 +38,9 @@ export const list = query({
 export const create = mutation({
   args: {
     operatorId: v.string(),
-    courseId: v.optional(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    issueId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     title: v.string(),
     description: v.string(),
     assignee: v.string(),
@@ -51,12 +51,12 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const { operatorId, ...recordArgs } = args;
-    if (args.courseId) {
-      await requireCourseAccess(ctx, operatorId, args.courseId);
-    } else if (args.programId) {
-      await requireProgramAccess(ctx, operatorId, args.programId);
-    } else if (args.campusId) {
-      await requireCampusAccess(ctx, operatorId, args.campusId);
+    if (args.issueId) {
+      await requireIssueAccess(ctx, operatorId, args.issueId);
+    } else if (args.storeId) {
+      await requireStoreAccess(ctx, operatorId, args.storeId);
+    } else if (args.regionId) {
+      await requireRegionAccess(ctx, operatorId, args.regionId);
     }
     const existing = await ctx.db.query("actionItems").collect();
     const nextNumber =
@@ -74,8 +74,8 @@ export const create = mutation({
       actorId: operatorId,
       eventType: "action_item.created",
       status: "success",
-      programId: args.programId,
-      campusId: args.campusId,
+      storeId: args.storeId,
+      regionId: args.regionId,
       entityId: `ACT-${String(nextNumber).padStart(3, "0")}`,
       summary: `Created action item ${args.title}.`,
     });
@@ -99,10 +99,10 @@ export const updateStatus = mutation({
     if (!existing) {
       throw new Error(`Action item ${args.actionItemId} not found.`);
     }
-    if (existing.programId) {
-      await requireProgramAccess(ctx, args.operatorId, existing.programId);
-    } else if (existing.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, existing.campusId);
+    if (existing.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, existing.storeId);
+    } else if (existing.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, existing.regionId);
     }
     const result = await ctx.db.patch(existing._id, {
       status: args.status,
@@ -112,8 +112,8 @@ export const updateStatus = mutation({
       actorId: args.operatorId,
       eventType: "action_item.status_updated",
       status: "success",
-      programId: existing.programId,
-      campusId: existing.campusId,
+      storeId: existing.storeId,
+      regionId: existing.regionId,
       entityId: existing.actionItemId,
       summary: `Changed ${existing.actionItemId} to ${args.status}.`,
     });

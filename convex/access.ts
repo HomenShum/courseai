@@ -11,48 +11,50 @@ export async function requireOperator(ctx: any, operatorId: string) {
   return operator;
 }
 
-export async function requireProgramAccess(ctx: any, operatorId: string, programId: string) {
+export async function requireStoreAccess(ctx: any, operatorId: string, storeId: string) {
   const operator = await requireOperator(ctx, operatorId);
 
-  if (operator.role === "department_chair") {
-    const program = await ctx.db
-      .query("programs")
-      .withIndex("by_programId", (q: any) => q.eq("programId", programId))
+  if (operator.role === "regional_manager") {
+    const store = await ctx.db
+      .query("stores")
+      .withIndex("by_storeId", (q: any) => q.eq("storeId", storeId))
       .first();
-    if (!program || !operator.campusIds.some((c: string) => c === program.campus || c === "ALL")) {
-      throw new Error(`Operator ${operator.name} cannot access program ${programId}.`);
+    if (!store || !operator.regionIds.includes(store.regionId)) {
+      throw new Error(`Operator ${operator.name} cannot access store ${storeId}.`);
     }
     return operator;
   }
 
-  if (!operator.programIds.includes(programId)) {
-    throw new Error(`Operator ${operator.name} cannot access program ${programId}.`);
+  if (!operator.storeIds.includes(storeId)) {
+    throw new Error(`Operator ${operator.name} cannot access store ${storeId}.`);
   }
 
   return operator;
 }
 
-export async function requireCampusAccess(ctx: any, operatorId: string, campusId: string) {
+export async function requireRegionAccess(ctx: any, operatorId: string, regionId: string) {
   const operator = await requireOperator(ctx, operatorId);
-  if (operator.role !== "department_chair" && operator.role !== "academic_advisor") {
-    if (!operator.campusIds.includes(campusId) && !operator.campusIds.includes("ALL")) {
-      throw new Error(`Operator ${operator.name} cannot access campus ${campusId}.`);
-    }
+  if (operator.role !== "regional_manager" || !operator.regionIds.includes(regionId)) {
+    throw new Error(`Operator ${operator.name} cannot access region ${regionId}.`);
   }
   return operator;
 }
 
-export async function requireCourseAccess(ctx: any, operatorId: string, courseId: string) {
-  const course = await ctx.db
-    .query("courses")
-    .withIndex("by_courseId", (q: any) => q.eq("courseId", courseId))
+export async function requireIssueAccess(ctx: any, operatorId: string, issueId: string) {
+  const issue = await ctx.db
+    .query("issues")
+    .withIndex("by_issueId", (q: any) => q.eq("issueId", issueId))
     .first();
 
-  if (!course) {
-    throw new Error(`Course ${courseId} not found.`);
+  if (!issue) {
+    throw new Error(`Issue ${issueId} not found.`);
   }
 
-  await requireProgramAccess(ctx, operatorId, course.programId);
+  if (issue.storeId === "STR-ALL") {
+    await requireRegionAccess(ctx, operatorId, "REG-NE");
+  } else {
+    await requireStoreAccess(ctx, operatorId, issue.storeId);
+  }
 
-  return course;
+  return issue;
 }

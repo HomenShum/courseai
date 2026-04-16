@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 
-import { requireOperator, requireCampusAccess, requireProgramAccess } from "./access";
+import { requireOperator, requireRegionAccess, requireStoreAccess } from "./access";
 import { mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
@@ -55,10 +55,10 @@ export const generateUploadUrl = mutation({
 export const create = mutation({
   args: {
     operatorId: v.string(),
-    courseId: v.optional(v.string()),
+    issueId: v.optional(v.string()),
     sessionId: v.optional(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     filename: v.string(),
     mimeType: v.string(),
     sizeBytes: v.number(),
@@ -68,19 +68,19 @@ export const create = mutation({
     summary: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
     const fileId = await nextFileId(ctx);
     await ctx.db.insert("files", {
       fileId,
-      courseId: args.courseId,
+      issueId: args.issueId,
       sessionId: args.sessionId,
-      programId: args.programId,
-      campusId: args.campusId,
+      storeId: args.storeId,
+      regionId: args.regionId,
       filename: args.filename,
       mimeType: args.mimeType,
       fileCategory: inferFileCategory(args.mimeType),
@@ -95,8 +95,8 @@ export const create = mutation({
       actorId: args.operatorId,
       eventType: "file.uploaded",
       status: "success",
-      programId: args.programId,
-      campusId: args.campusId,
+      storeId: args.storeId,
+      regionId: args.regionId,
       entityId: fileId,
       summary: `Uploaded ${args.filename}.`,
       detailsJson: JSON.stringify({
@@ -114,12 +114,21 @@ export const create = mutation({
   },
 });
 
-export const getByCourse = query({
-  args: { operatorId: v.string(), courseId: v.string() },
+export const getByIssue = query({
+  args: { operatorId: v.string(), issueId: v.string() },
   handler: async (ctx, args) => {
+    const issue = await ctx.db
+      .query("issues")
+      .withIndex("by_issueId", (q: any) => q.eq("issueId", args.issueId))
+      .first();
+    if (issue?.storeId === "STR-ALL") {
+      await requireRegionAccess(ctx, args.operatorId, "REG-NE");
+    } else if (issue?.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, issue.storeId);
+    }
     const files = await ctx.db
       .query("files")
-      .withIndex("by_course", (q) => q.eq("courseId", args.courseId))
+      .withIndex("by_issue", (q) => q.eq("issueId", args.issueId))
       .collect();
     return await hydrateFilesWithUrls(ctx, files);
   },
@@ -129,15 +138,15 @@ export const getBySession = query({
   args: {
     operatorId: v.string(),
     sessionId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
     const files = await ctx.db
       .query("files")
@@ -151,15 +160,15 @@ export const getByIds = query({
   args: {
     operatorId: v.string(),
     fileIds: v.array(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
     if (args.fileIds.length === 0) {
       return [];
@@ -172,26 +181,26 @@ export const getByIds = query({
   },
 });
 
-export const listByCourseIds = query({
+export const listByIssueIds = query({
   args: {
     operatorId: v.string(),
-    courseIds: v.array(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    issueIds: v.array(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
-    if (args.courseIds.length === 0) {
+    if (args.issueIds.length === 0) {
       return [];
     }
-    const wanted = new Set(args.courseIds);
+    const wanted = new Set(args.issueIds);
     const files = (await ctx.db.query("files").collect()).filter(
-      (file: any) => file.courseId && wanted.has(file.courseId)
+      (file: any) => file.issueId && wanted.has(file.issueId)
     );
     return await hydrateFilesWithUrls(ctx, files);
   },
@@ -207,11 +216,11 @@ export const remove = mutation({
     if (!file) {
       throw new Error(`File ${args.fileId} not found.`);
     }
-    if (file.programId) {
-      await requireProgramAccess(ctx, args.operatorId, file.programId);
+    if (file.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, file.storeId);
     }
-    if (file.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, file.campusId);
+    if (file.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, file.regionId);
     }
     if (file.storageId) {
       await ctx.storage.delete(file.storageId as Id<"_storage">);
@@ -221,8 +230,8 @@ export const remove = mutation({
       actorId: args.operatorId,
       eventType: "file.removed",
       status: "success",
-      programId: file.programId,
-      campusId: file.campusId,
+      storeId: file.storeId,
+      regionId: file.regionId,
       entityId: file.fileId,
       summary: `Removed ${file.filename}.`,
     });

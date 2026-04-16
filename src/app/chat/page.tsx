@@ -18,15 +18,15 @@ function ChatPreviewShell() {
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-950">
-                  Faculty chat with a live assistant rail
+                  Group chat with a live operator rail
                 </h1>
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                  The shared channel stays in the center. The assistant rail stays on the right for
+                  The shared channel stays in the center. The operator rail stays on the right for
                   plan trace, sources, telemetry, and quality checks.
                 </p>
               </div>
               <div className="rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                User session required
+                Operator session required
               </div>
             </div>
           </header>
@@ -35,16 +35,16 @@ function ChatPreviewShell() {
             <div className="flex h-full flex-col">
               <div className="flex-1 overflow-y-auto px-4 py-4">
                 <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center py-20 text-center">
-                  <p className="text-2xl font-semibold text-slate-900">Welcome to # faculty</p>
+                  <p className="text-2xl font-semibold text-slate-900">Welcome to # general</p>
                   <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
-                    Pick a professor or department chair identity first so the shared channel and the
+                    Pick a store or regional operator identity first so the shared channel and the
                     AI rail can enforce the right workspace scope.
                   </p>
                   <div className="mt-6 flex flex-wrap justify-center gap-2">
                     {[
-                      "Which programs need curriculum attention first?",
-                      "Any prerequisite bottlenecks I should know about?",
-                      "Summarize accreditation compliance status.",
+                      "Which stores need intervention first?",
+                      "Any cross-store patterns I should know about?",
+                      "Summarize today's open escalations.",
                     ].map((prompt) => (
                       <span
                         key={prompt}
@@ -55,7 +55,7 @@ function ChatPreviewShell() {
                     ))}
                   </div>
                   <Link href="/" className="btn-primary mt-8 inline-flex">
-                    Choose user session
+                    Choose operator session
                   </Link>
                 </div>
               </div>
@@ -66,7 +66,7 @@ function ChatPreviewShell() {
                     type="text"
                     value=""
                     readOnly
-                    placeholder="Message # faculty once a user session is active..."
+                    placeholder="Message # general once an operator session is active..."
                     className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
                   />
                   <button
@@ -99,7 +99,7 @@ function ChatPreviewShell() {
             <div className="rounded-[18px] border border-[rgba(72,57,39,0.08)] bg-white px-4 py-3">
               <p className="section-label">Mode</p>
               <p className="mt-2 text-sm font-semibold text-slate-900">Shared channel</p>
-              <p className="mt-1 text-xs text-slate-500">Waiting for user identity</p>
+              <p className="mt-1 text-xs text-slate-500">Waiting for operator identity</p>
             </div>
             <div className="rounded-[18px] border border-[rgba(72,57,39,0.08)] bg-white px-4 py-3">
               <p className="section-label">Quality</p>
@@ -121,12 +121,12 @@ function ChatPreviewShell() {
           </div>
 
           <div className="mt-5 rounded-[20px] border border-[rgba(72,57,39,0.12)] bg-white px-4 py-4">
-            <p className="section-label">Suggested prompts</p>
+            <p className="section-label">Suggested shared prompts</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {[
-                "Which programs need curriculum attention first?",
-                "Summarize faculty load across programs.",
-                "What curriculum gaps are emerging?",
+                "Which stores need intervention first?",
+                "Summarize today's open escalations.",
+                "What cross-store patterns are emerging?",
               ].map((prompt) => (
                 <span
                   key={prompt}
@@ -141,7 +141,7 @@ function ChatPreviewShell() {
 
         <div className="border-t border-[rgba(72,57,39,0.08)] bg-[rgba(255,252,246,0.92)] px-5 py-4">
           <Link href="/" className="btn-primary flex w-full items-center justify-center">
-            Choose user session to activate rail
+            Choose operator session to activate rail
           </Link>
         </div>
       </aside>
@@ -167,10 +167,10 @@ function ChatPageInner() {
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-950">
-                  Faculty chat with a live assistant rail
+                  Group chat with a live operator rail
                 </h1>
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                  The centered channel is where faculty collaborate. The right rail follows the
+                  The centered channel is where operators talk together. The right rail follows the
                   same shared session and exposes the assistant trace, telemetry, sources, and quality checks.
                 </p>
               </div>

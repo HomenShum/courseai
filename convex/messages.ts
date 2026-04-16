@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { requireCampusAccess, requireProgramAccess } from "./access";
+import { requireRegionAccess, requireStoreAccess } from "./access";
 
 export const send = mutation({
   args: {
@@ -8,8 +8,8 @@ export const send = mutation({
     content: v.string(),
     senderName: v.optional(v.string()),
     status: v.optional(v.string()),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     sessionId: v.string(),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
@@ -26,8 +26,8 @@ export const send = mutation({
 export const createDraftAssistant = mutation({
   args: {
     sessionId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     createdAt: v.number(),
     metadataJson: v.optional(v.string()),
   },
@@ -37,8 +37,8 @@ export const createDraftAssistant = mutation({
       content: "",
       status: "streaming",
       sessionId: args.sessionId,
-      programId: args.programId,
-      campusId: args.campusId,
+      storeId: args.storeId,
+      regionId: args.regionId,
       createdAt: args.createdAt,
       updatedAt: args.createdAt,
       metadataJson: args.metadataJson,
@@ -87,8 +87,8 @@ export const appendEvent = mutation({
   args: {
     messageId: v.id("messages"),
     sessionId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
     eventType: v.string(),
     sequence: v.number(),
     summary: v.string(),
@@ -104,15 +104,15 @@ export const getBySession = query({
   args: {
     operatorId: v.string(),
     sessionId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
     return await ctx.db
       .query("messages")
@@ -125,15 +125,15 @@ export const getEventsBySession = query({
   args: {
     operatorId: v.string(),
     sessionId: v.string(),
-    programId: v.optional(v.string()),
-    campusId: v.optional(v.string()),
+    storeId: v.optional(v.string()),
+    regionId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.programId) {
-      await requireProgramAccess(ctx, args.operatorId, args.programId);
+    if (args.storeId) {
+      await requireStoreAccess(ctx, args.operatorId, args.storeId);
     }
-    if (args.campusId) {
-      await requireCampusAccess(ctx, args.operatorId, args.campusId);
+    if (args.regionId) {
+      await requireRegionAccess(ctx, args.operatorId, args.regionId);
     }
     return await ctx.db
       .query("messageEvents")

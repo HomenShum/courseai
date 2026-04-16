@@ -17,8 +17,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CourseAI — Education Course Planning Support",
-  description: "Curriculum AI for professors and department chairs",
+  title: "FloorAI — Retail Operations Intelligence",
+  description: "Floor-level AI for store and regional operations management",
 };
 
 export default function RootLayout({
