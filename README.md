@@ -1,3 +1,51 @@
+# CourseAI — developer starting point
+
+CourseAI is an education-oriented fork of the FloorAI retail prototype. The education migration is incomplete. A developer or coding agent should start with source review and an explicit migration contract before trying to use it as an education application.
+
+This handoff describes the source at `c73fe6d70d08669c123ac0241992fc0757b8bd58`. It is a source review, not evidence of a successful install, build, running service, provider response, user isolation, UI quality or production readiness. The original FloorAI README remains unchanged below as a historical snapshot; its setup, assets, results and “shipped” claims are not current CourseAI verification.
+
+## Start here
+
+1. Read [AGENTS.md](AGENTS.md), then follow the source map below.
+2. Trace the selected role from the home picker through the session provider, workspace query, schema and access helper before changing any of them.
+3. Agree on the education roles, program ownership, table fields and server-side authorization contract for one bounded implementation slice. The current code does not establish a complete education contract.
+4. Record a real before/after scenario and run the relevant checks when that implementation is authorized. This documentation change runs source-only navigation checks.
+
+## Current source map
+
+| Reader question | Start in |
+| --- | --- |
+| What commands and dependencies are declared? | [package.json](package.json) |
+| Which role can a new user select? | [Home picker](src/app/page.tsx) |
+| Why does the browser still say FloorAI? | [Root layout](src/app/layout.tsx) |
+| What does the course workspace expect? | [Course page](src/app/course/page.tsx) |
+| What does the department workspace expect? | [Department page](src/app/department/page.tsx) |
+| Where is the selected operator stored? | [Operator session provider](src/components/OperatorSessionProvider.tsx) |
+| How is the frontend connected to Convex? | [Convex client provider](src/components/ConvexClientProvider.tsx) |
+| What tables and user fields are defined? | [Convex schema](convex/schema.ts) |
+| What access checks are currently implemented? | [Convex access helpers](convex/access.ts) |
+
+## Incomplete contracts to resolve
+
+- **Role and navigation mismatch:** the course page expects `professor` or `academic_advisor` and `programIds`; the department page expects `department_chair`. Home still offers `store_manager` and `regional_manager` and links to retail workspaces. The tracked tree has no `src/app/store/page.tsx` or `src/app/regional/page.tsx`. This is a source-path observation, not a measured HTTP response.
+- **Data mismatch:** the selected schema defines retail tables and user `storeIds`/`regionIds`, without `programIds` or `courses`/`programs` table definitions. Education-named backend modules exist, but their presence does not prove that the frontend, generated API and deployed schema agree.
+- **Ownership and authentication require review:** the selected operator is stored in browser localStorage; the client uses plain `ConvexProvider`; the selected access helper accepts an `operatorId` argument. A browser-selected role is not proof of authenticated ownership. The inspected files do not establish production user isolation; this is not an exhaustive security audit.
+- **Branding remains mixed:** package name, layout metadata, home and inherited documents still use FloorAI/retail language. This handoff does not rename runtime or backend behavior.
+
+## Commands and configuration: declared, not verified
+
+[package.json](package.json) declares `npm run dev` as Convex development plus Next.js, `npm run dev:app` as Next.js alone, `npm run dev:convex` as Convex development, and `npm run build` as a Next.js build. These commands were not run for this handoff. There is no `test` script in this package.
+
+The client reads the configuration name `NEXT_PUBLIC_CONVEX_URL` and renders a missing-connection message when it is absent. No environment values were inspected and no environment template or new local configuration is supplied. Do not reuse tracked local environment files or development logs as credential examples.
+
+The inherited instructions include seeding, live evaluation, provider configuration and video commands. Treat them as historical, potentially state-changing or paid operations until their callers and intended deployment are reviewed. The declared video commands require a `video/package.json` that is absent from this tracked tree. The inherited Node/Python version guidance has not been validated here.
+
+The next implementation handoff must name its owner, role/data/access contract, target deployment, permitted state changes and actual verification evidence. This source-only documentation repair does not complete that migration.
+
+Documentation history: [index](CHANGELOG/README.md).
+
+## Historical FloorAI README (unchanged source snapshot)
+
 # FloorAI
 
 Retail operations assistant for store managers and regional managers, built with Next.js, Convex, and Gemini.

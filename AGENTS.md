@@ -1,3 +1,17 @@
+# CourseAI — current agent handoff
+
+Read [README.md](README.md) first. This repository is an incomplete education migration of the FloorAI retail prototype; the inherited workflow below does not certify education readiness.
+
+Before editing, trace [Home](src/app/page.tsx) → [operator session](src/components/OperatorSessionProvider.tsx) → the [course](src/app/course/page.tsx) or [department](src/app/department/page.tsx) workspace → [schema](convex/schema.ts) and [access helpers](convex/access.ts). Education roles/program ownership and the retained retail home/schema/access contract do not currently agree. Choose and prove one bounded migration slice before broad rebranding or deployment.
+
+Do not treat localStorage role selection or a passed operator ID as authenticated ownership. Do not claim runtime, provider, security, UI or production success from a source-only check. Preserve unrelated work and report unresolved contracts explicitly.
+
+Before any Convex source change, read the required [Convex guidelines](convex/_generated/ai/guidelines.md). The general workflow and Convex guidance below still apply; retail personas, local workstation links and historical golden-evaluation claims are inherited context, not proof of a working education flow. No dataset, environment value or development log was read for this handoff.
+
+Documentation history: [index](CHANGELOG/README.md).
+
+## Inherited retail workflow (unchanged source snapshot)
+
 # Retail Ops Agent Workflow
 
 This repository adopts the lifecycle and quality bar from `addyosmani/agent-skills`, adapted for a retail operations AI product built with Next.js, Convex, Gemini, and Python Deep Agents.
